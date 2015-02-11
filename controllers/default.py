@@ -12,8 +12,22 @@
 def index():
     startAsRestaurant = A('Start As Restuarant', _class='btn', _href=URL('default', 'login', args=['restaurant']))
     startAsUser = A('Start As User', _class='btn', _href=URL('default', 'login', args=['user']))
-    return dict(startAsRestaurant=startAsRestaurant,startAsUser=startAsUser)
+    return dict(startAsRestaurant=startAsRestaurant, startAsUser=startAsUser)
 
+def login():
+    destination = 'error'
+    if (request.args(0) and request.args(0) == 'user'):
+        destination = 'main'
+    elif (request.args(0) and request.args(0) == 'restaurant'):
+        destination = 'restaurants'
+    continueButton = A('Continue', _class='btn', _href=URL('default', destination))
+    return dict(continueButton=continueButton)
+
+def restaurants():
+    return dict()
+
+def main():
+    return dict()
 
 def user():
     """
