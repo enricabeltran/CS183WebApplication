@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 db.define_table('restaurants',
-    Field('account_ID', unique=True),
+    Field('accountID', unique=True),
     Field('name'),
     Field('email'),
     Field('phone'),
@@ -13,7 +13,7 @@ db.define_table('restaurants',
     )
 
 db.define_table('users',
-    Field('account_ID', unique=True),
+    Field('accountID', unique=True),
     Field('name'),
     Field('email'),
     Field('phone'),
