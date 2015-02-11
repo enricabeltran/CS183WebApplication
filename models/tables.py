@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
-import re
-import unittest
-
 db.define_table('restaurants',
     Field('account_ID', unique=True),
     Field('name'),
