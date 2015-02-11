@@ -10,15 +10,9 @@
 #########################################################################
 
 def index():
-    """
-    example action using the internationalization operator T and flash
-    rendered by views/default/index.html or views/generic.html
-
-    if you need a simple wiki simply replace the two lines below with:
-    return auth.wiki()
-    """
-    response.flash = T("Welcome to web2py!")
-    return dict(message=T('Hello World'))
+    startAsRestaurant = A('Start As Restuarant', _class='btn', _href=URL('default', 'login', args=['restaurant']))
+    startAsUser = A('Start As User', _class='btn', _href=URL('default', 'login', args=['user']))
+    return dict(startAsRestaurant=startAsRestaurant,startAsUser=startAsUser)
 
 
 def user():
