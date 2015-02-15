@@ -1,3 +1,32 @@
 {{extend 'layout.html'}}
 <h1>This is the default/main.html template</h1>
+
+<p id='location'></p>
+
+<script>
+    var x = document.getElementById("location");
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+            x.innerHTML = "Woops! I can't tell where you are!";
+        }
+    }
+
+    function showPosition(position) {
+        x.innerHTML = "I think you are at latitude " + position.coords.latitude + " and longitude " + position.coords.longitude + ".";
+    }
+
+    function getMyLocation() {
+        var locationString = "Oops! I can't tell where you are!";
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position){
+                x.innerHTML = "I think you are at latitude " + position.coords.latitude + " and longitude " + position.coords.longitude + ".";
+            });
+        }
+    }
+   getMyLocation();
+</script>
 {{=BEAUTIFY(response._vars)}}
