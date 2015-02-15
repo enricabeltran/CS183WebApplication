@@ -2,5 +2,5 @@
 
 Project Members:
 - Enrica Beltran
-- Brandon Rumallas
+- Brandon Rullamas
 - Samuel Reha
