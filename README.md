@@ -4,4 +4,3 @@ Project Members:
 - Enrica Beltran
 - Brandon Rumallas
 - Samuel Reha
-- Misbah Khan
