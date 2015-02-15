@@ -1,30 +1,29 @@
 {{extend 'layout.html'}}
 <h1>This is the default/main.html template</h1>
 
-<p id='location'></p>
+<p id='location'>Figuring out your location...</p>
 
 <script>
     var x = document.getElementById("location");
 
-    function getLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition);
-        } else {
-            x.innerHTML = "Woops! I can't tell where you are!";
-        }
-    }
-
-    function showPosition(position) {
-        x.innerHTML = "I think you are at latitude " + position.coords.latitude + " and longitude " + position.coords.longitude + ".";
-    }
-
     function getMyLocation() {
-        var locationString = "Oops! I can't tell where you are!";
+        var errorMessage = "Oops! I can't tell where you are!";
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position){
                 x.innerHTML = "I think you are at latitude " + position.coords.latitude + " and longitude " + position.coords.longitude + ".";
+
+                var coordString = position.coords.latitude + ',' + position.coords.longitude;
+                var googleQuery = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + coordString; // This will be used to query Google and find out fluff data, like city name.
+
+                $.get(googleQuery, function(response, status){
+                    //var data = JSON.parse(response);
+                    //var city = data['formatted_address'];
+                    x.innerHTML = x.innerHTML + '<p>This is my best guess at your address: ' + response.results[0].formatted_address + '.</p>'
+                });
             });
+        } else {
+            x.innerHTML = errorMessage;
         }
     }
    getMyLocation();
