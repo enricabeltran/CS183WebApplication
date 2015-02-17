@@ -1,3 +1,9 @@
 {{extend 'layout.html'}}
 
-{{=continueButton}} <!-- This SHOULD be a log in system. But it's not for now. -->
+{{=form}} <!-- WHOOOP login system! gotta implement groups tho -->
+
+{{if not register and request.args(0)=='user':}}
+{{=A('Register as a User', _class='btn', _href=URL('default', 'login', args=[request.args(0),'register']))}}
+{{elif not register and request.args(0)=='restaurant':}}
+{{=A('Register as a Resturant Representative', _class='btn', _href=URL('default', 'login', args=[request.args(0),'register']))}}
+{{pass}}

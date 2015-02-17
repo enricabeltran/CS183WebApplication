@@ -10,18 +10,49 @@
 #########################################################################
 
 def index():
-    startAsRestaurant = A('Start As Restuarant', _class='btn', _href=URL('default', 'login', args=['restaurant']))
-    startAsUser = A('Start As User', _class='btn', _href=URL('default', 'login', args=['user']))
+    form = ''
+    
+    #if user is logged in
+    if(db.auth_user != None):
+        #user has not been added to user or restaurant talbe
+        if(db.auth_user.infoObtained == False):
+            if(db.auth_user.accountType == 'User'):
+                form = SQLFORM(db.users)
+                if form.process().accepted:
+                    db.auth_user.infoObtained = True
+                    session.flash("inserted into table")
+                    redirect(URL('default', 'main'))
+            #elif(db.auth_user.accountType == 'Restaurant Representative'):
+            else:
+                form = SQLFORM(db.restaurants)
+                if form.process().accepted:
+                    db.auth_user.infoObtained = True
+                    session.flash("inserted into table")
+                    redirect(URL('default', 'restaurants'))
+    else:
+        startAsRestaurant = A('Start As Restuarant', _class='btn', _href=URL('default', 'login', args=['restaurant']))
+        startAsUser = A('Start As User', _class='btn', _href=URL('default', 'login', args=['user']))
     return dict(startAsRestaurant=startAsRestaurant, startAsUser=startAsUser)
 
 def login():
+    #need to figure out how to implement auth_group
+    
     destination = 'error'
-    if (request.args(0) and request.args(0) == 'user'):
+    form = ''
+    register = False
+    if(request.args(1) and request.args(1)=='register'):
+        register = True
+        form = auth.register()
+    elif (request.args(0) and request.args(0) == 'user'):
+        form = auth.login()
         destination = 'main'
     elif (request.args(0) and request.args(0) == 'restaurant'):
+        form = auth.login()
         destination = 'restaurants'
-    continueButton = A('Continue', _class='btn', _href=URL('default', destination))
-    return dict(continueButton=continueButton)
+        
+    return dict(destination=destination, form=form, register=register)
+
+
 
 def restaurants():
     return dict()
