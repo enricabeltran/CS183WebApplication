@@ -1,3 +1,37 @@
 {{extend 'layout.html'}}
 <h1>This is the default/main.html template</h1>
+
+<p id='location'>Figuring out your location...</p>
+
+<script>
+    var x = document.getElementById("location");
+
+    function getMyLocation() {
+        var errorMessage = "Oops! I can't tell where you are!";
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position){
+                x.innerHTML = "I think you are at latitude " + position.coords.latitude + " and longitude " + position.coords.longitude + ".";
+
+                var coordString = position.coords.latitude + ',' + position.coords.longitude;
+                var googleQuery = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + coordString; // This will be used to query Google and find out fluff data, like city name.
+
+                $.get(googleQuery, function(response, status){
+                    x.innerHTML = x.innerHTML + '<p>This is my best guess at your address: ' + response.results[0].formatted_address + '.</p>'
+                    /* Okay, so the response object on a Google maps query is probably the ugliest thing I've ever seen in my life.
+                       The thing to look at is response.results, which is a list of best-guess addresses orderd from most specific to least specific.
+                       So, response.results[0] would be a full street address, but response.results[response.results.length - 1] would just be the
+                       name of the country, or something. Every result contains a formatted_address, a geometry object that includes lat and long numbers,
+                       a "types" attribute (for example, types might equal "street address"), as well as "address_components", a list of all
+                       "address_components", which are the individual components it used to form the formatted_address, along with other stuff.
+                       We can use address_components to figure out, for example, neighborhood, county or city, if we need to show that to the user.
+                     */
+                });
+            });
+        } else {
+            x.innerHTML = errorMessage;
+        }
+    }
+   getMyLocation();
+</script>
 {{=BEAUTIFY(response._vars)}}

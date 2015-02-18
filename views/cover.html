@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Feedr, the app to help you find the food that you didn't know you wanted to eat.">
+    <meta name="keywords" content="Feedr, food, UCSC, Santa Cruz, CMPS 183">
+    <meta name="author" content="Brandon Rullamas, Enrica Beltran, Sam Reha">
+    <link rel="icon" href="../static/images/cutlery.png">
+
+    <title>Feedr</title>
+
+    <!-- Bootstrap core CSS -->
+    {{
+	response.files.insert(0,URL('static','css/bootstrap.min.css'))
+	response.files.insert(1,URL('static','css/bootstrap-responsive.min.css'))
+	response.files.insert(2,URL('static','css/cover.css'))
+	}}
+
+	{{include 'web2py_ajax.html'}}
+
+	{{
+	# using sidebars need to know what sidebar you want to use
+	left_sidebar_enabled = globals().get('left_sidebar_enabled',False)
+	right_sidebar_enabled = globals().get('right_sidebar_enabled',False)
+	middle_columns = {0:'span12',1:'span9',2:'span6'}[
+		(left_sidebar_enabled and 1 or 0)+(right_sidebar_enabled and 1 or 0)]
+	}}
+	
+	<!--<link rel="stylesheet" type="text/css" href="../static/css/cover.css" />-->
+	
+  </head>
+
+  <body>
+
+    <div class="site-wrapper">
+	
+      <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+          <div class="masthead clearfix">
+            <div class="inner">
+              <h3 class="masthead-brand">Feedr</h3>
+              <nav>
+                <ul class="nav masthead-nav">
+                  <li class="active"><a href="#">Home</a></li>
+                  <li><a href="#">About</a></li>
+                  <li><a href="#">Contact</a></li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+
+          <div class="inner cover">
+            <h1 class="cover-heading">Feedr</h1>
+            <p class="lead">The app to help you find the food that you didn't know you wanted to eat. Swipe through images of local foods,
+							choose your favorites, and enjoy!</p>
+            <p class="lead">
+              <a href="#" class="btn btn-lg btn-default">Learn more</a>
+            </p>
+          </div>
+
+          <div class="mastfoot">
+            <div class="inner">
+              <p>Copyright <a href="https://github.com/Rullamas">Brandon Rullamas</a>, <a href="https://github.com/enricabeltran">Enrica Beltran</a>, 
+			    <a href="https://github.com/SamReha">Sam Reha</a>.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="../../dist/js/bootstrap.min.js"></script>
+    <script src="../../assets/js/docs.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+  </body>
+</html>
