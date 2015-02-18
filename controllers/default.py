@@ -13,6 +13,9 @@ def index():
     form = ''
     startAsRestaurant = ''
     startAsUser = ''
+    
+    #BRANDON, instead of doing a form in index to fill out the restaurants/users table, should i move it to a different URL so your index CSS works correctly for all cases?
+    
     #if user/rep is logged in
     if(auth.user != None):
         if(db.auth_user.accountType == 'User'):
@@ -30,7 +33,6 @@ def index():
         else:
             #if not in restaurant table, get info
             if(db.auth_user.infoObtained == False):
-                db.auth_user.accountType.default = 'Restaurant Representative' #WHY WONT YOU HAPPEN
                 form = SQLFORM(db.restaurants)
                 if form.process().accepted:
                     auth.user.infoObtained = True #i dont think this is happening
@@ -50,14 +52,15 @@ def login():
     destination = 'error'
     form = ''
     register = False
+    #sends user to the correct login/register page
     if(request.args(1) and request.args(1)=='register'):
         register = True
         t = ''
         if(request.args(0)=='user'):
             t = 'User'
         else:
-            t = 'Restaurant Representative'    
-        db.auth_user.accountType.default = t #this is also not happening 
+            t = 'Restaurant Representative'
+        db.auth_user.accountType.default = t
         form = auth.register()
     elif (request.args(0) and request.args(0) == 'user'):
         form = auth.login()
