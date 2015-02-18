@@ -47,17 +47,20 @@ auth = Auth(db)
 service = Service()
 plugins = PluginManager()
 
-ACCOUNT_TYPE = ['User', 'Restaurant Representative']
+
+
+ACCOUNTTYPE = ['User', 'Restaurant Representative']
 
 #tells us if a particular user account is a user/rep and if info been added to the db.restaurants/db.users tables for this account 
 auth.settings.extra_fields['auth_user']= [
     Field('infoObtained', 'boolean', default = False),
-    Field('accountType', default = 'User')]
+    Field('accountType', writable=False, required=True)]
 
 ## create all tables needed by auth if not custom tables
 auth.define_tables(username=False, signature=False)
 
-db.auth_user.accountType.requiress = IS_IN_SET(ACCOUNT_TYPE)
+#WHY DOES THIS NOT CREATE A DROP DOWN IN AUTH.REGISTER PAGE
+db.auth_user.accountType.required = IS_IN_SET(ACCOUNTTYPE)
 
 ## configure email
 mail = auth.settings.mailer

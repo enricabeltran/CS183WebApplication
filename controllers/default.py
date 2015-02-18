@@ -11,37 +11,53 @@
 
 def index():
     form = ''
-    
-    #if user is logged in
-    if(db.auth_user != None):
-        #user has not been added to user or restaurant talbe
-        if(db.auth_user.infoObtained == False):
-            if(db.auth_user.accountType == 'User'):
+    startAsRestaurant = ''
+    startAsUser = ''
+    #if user/rep is logged in
+    if(auth.user != None):
+        if(db.auth_user.accountType == 'User'):
+            #if not in user table, get info
+            if(db.auth_user.infoObtained == False):
                 form = SQLFORM(db.users)
                 if form.process().accepted:
-                    db.auth_user.infoObtained = True
-                    session.flash("inserted into table")
+                    auth.user.infoObtained = True #i dont think this is happening
+                    session.flash = T("inserted into table")
+                    #go to main page
                     redirect(URL('default', 'main'))
-            #elif(db.auth_user.accountType == 'Restaurant Representative'):
+            #user is in table, go to main page
             else:
+                redirect(URL('default', 'main'))
+        else:
+            #if not in restaurant table, get info
+            if(db.auth_user.infoObtained == False):
+                db.auth_user.accountType.default = 'Restaurant Representative' #WHY WONT YOU HAPPEN
                 form = SQLFORM(db.restaurants)
                 if form.process().accepted:
-                    db.auth_user.infoObtained = True
-                    session.flash("inserted into table")
+                    auth.user.infoObtained = True #i dont think this is happening
+                    session.flash = T("inserted into table")
+                    #go to restaurant page
                     redirect(URL('default', 'restaurants'))
+            #restaurant is in table, go to main page
+            else:
+                redirect(URL('default', 'restaurants'))
     else:
-        startAsRestaurant = A('Start As Restuarant', _class='btn', _href=URL('default', 'login', args=['restaurant']))
-        startAsUser = A('Start As User', _class='btn', _href=URL('default', 'login', args=['user']))
-    return dict(startAsRestaurant=startAsRestaurant, startAsUser=startAsUser)
+         startAsRestaurant = A('Start As Restuarant', _class='btn', _href=URL('default', 'login', args=['restaurant']))
+         startAsUser = A('Start As User', _class='btn', _href=URL('default', 'login', args=['user']))
+    return dict(startAsRestaurant=startAsRestaurant, startAsUser=startAsUser, form=form)
 
 def login():
-    #need to figure out how to implement auth_group
     
     destination = 'error'
     form = ''
     register = False
     if(request.args(1) and request.args(1)=='register'):
         register = True
+        t = ''
+        if(request.args(0)=='user'):
+            t = 'User'
+        else:
+            t = 'Restaurant Representative'    
+        db.auth_user.accountType.default = t #this is also not happening 
         form = auth.register()
     elif (request.args(0) and request.args(0) == 'user'):
         form = auth.login()
@@ -54,10 +70,17 @@ def login():
 
 
 
+@auth.requires_login()
 def restaurants():
+    if(auth.user.accountType == 'User'):
+        redirect(URL('default', 'main'))
+
     return dict()
 
 def main():
+    if(auth.user.accountType == 'Restaurant Representative'):
+        redirect(URL('default', 'restaurants'))
+
     return dict()
 
 def user():
