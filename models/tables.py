@@ -14,7 +14,6 @@ db.define_table('hours',
 )
 
 db.define_table('restaurants',
-    Field('restuarantID', unique=True),
     Field('name', required=True),
     Field('email'),
     Field('phone', required=True),
@@ -42,8 +41,7 @@ db.define_table('users',
 # Each menuItem describes a single menu item. It includes the ID of the restaurant that owns it. A restaurant menu is formed by querying the menuItem table for all items
 # matching the appropriate ID. This cuts down on the number of sub-tables required.
 db.define_table('menuItem',
-    Field('restaurantID'), #db.restaurants.id),
-    Field('menuID', unique=True),
+    Field('restaurantID'),
     Field('dishName', required = True),
     Field('description', required = True),
     Field('price', required = True),
