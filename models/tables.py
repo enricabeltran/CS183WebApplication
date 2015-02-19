@@ -8,12 +8,13 @@ db.define_table('addresses',
     )
 
 #update with appropriate fields
+# What is this supposed to be? - Sam
 db.define_table('hours',
     Field('enter something here')
 )
 
 db.define_table('restaurants',
-    Field('accountID', unique=True),
+    Field('restuarantID', unique=True),
     Field('name', required=True),
     Field('email'),
     Field('phone', required=True),
@@ -27,23 +28,28 @@ db.define_table('restaurants',
     #Field('images')
     )
 
+# I suspect we don't actually need a separate users table, my bad. - Sam
 db.define_table('users',
     Field('accountID', unique=True),
     Field('name', required = True),
     Field('email', required = True),
     Field('phone', required = True),
     Field('paymentInformation'),      # Should be reference to external table
-    Field('addressId'), #db.addresses.id), 
+    Field('addressId'), #db.addresses.id),
     )
 
 
-#holds all the different dishes of all restaurants 
-db.define_table('menu',
+# Each menuItem describes a single menu item. It includes the ID of the restaurant that owns it. A restaurant menu is formed by querying the menuItem table for all items
+# matching the appropriate ID. This cuts down on the number of sub-tables required.
+db.define_table('menuItem',
     Field('restaurantID'), #db.restaurants.id),
-    Field('dishName'),
-    Field('description'),
+    Field('menuID', unique=True),
+    Field('dishName', required = True),
+    Field('description', required = True),
+    Field('price', required = True),
     Field('image', 'upload'),
-    Field('tagCount'), #dishes are limited to 5 tags....we dont really need to implement this though? maybe if there is extra time?? to be honest, friends, i'm kind of getting lost in everything, THERE ARE SO MANY LITTLE DETAILS, LOOK AT ALL THESE TABLES!!
+    Field('tagCount'), # Dishes are limited to 5 tags. This wont be too hard, for each menuItem we just need to check how many Tags get returned for a given menuID query.
+                       # If 5 are found, we prevent the restaurant owner from adding more. If more than 5 are found, we can just trim off tags arbitrarily.
     )
 
 #holds all tags for all dishes 
