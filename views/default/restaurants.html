@@ -1,3 +1,11 @@
 {{extend 'layout.html'}}
-<h1>This is the default/restaurants.html template</h1>
-{{=BEAUTIFY(response._vars)}}
+<h1>Welcome, {{=ownerName}}</h1>
+
+{{if len(ownedRestaurants) == 0:}}
+    <p>You don't currently own any restaurants</p>
+{{else:}}
+    {{for i in range(0, len(ownedRestaurants)):}}
+        <p>Manage {{=ownedRestaurants[i].name}} {{=A('Disown This Restaurant', _class='btn', _href=URL('default', 'deleteRest', args = [ownedRestaurants[i].id]))}}</p>
+    {{pass}}
+{{pass}}
+{{=addRestaurantButton}}

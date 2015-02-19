@@ -78,7 +78,41 @@ def restaurants():
     if(auth.user.accountType == 'User'):
         redirect(URL('default', 'main'))
 
-    return dict()
+    ownedRestaurants = db(db.restaurants.ownerID == auth.user.id).select() # Oh boy, I really don't remember the syntax for queries...
+    ownerName = auth.user.first_name
+    addRestaurantButton = A('Add A Restaurant', _class='btn', _href=URL('default', 'addRest'))
+
+    return dict(ownedRestaurants=ownedRestaurants, ownerName=ownerName, addRestaurantButton=addRestaurantButton)
+
+def addRest():
+    form = SQLFORM.factory(Field('name',
+                                 label='Restaurant Name',
+                                 ),
+                           Field('phone',
+                                 label='Business Phone',
+                                 ),
+                           Field('email',
+                                 label='Business Email',
+                                 ),
+                           Field('description', 'text',
+                                 label='Restaurant Description',
+                                 ),
+                          )
+    if form.process().accepted:
+        db.restaurants.insert(ownerID = auth.user.id,
+                               name = form.vars.name,
+                               phone = form.vars.phone,
+                               email = form.vars.email,
+                               description = form.vars.description,
+                              )
+        redirect(URL('default', 'restaurants'))
+
+    return dict(form=form)
+
+@auth.requires_login()
+def deleteRest():
+    db(db.restaurants.id == request.args(0)).delete()
+    redirect(URL('default', 'restaurants'))
 
 def main():
     if(auth.user.accountType == 'Restaurant Representative'):

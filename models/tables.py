@@ -17,6 +17,7 @@ db.define_table('hours',
 STYLES = ['American', 'Chinese', 'Japanse', 'Korean', 'Vietnamese', 'Mongolian', 'Mexican', 'Cuban', 'Indian', 'British', 'French', 'Italian', 'German']
 
 db.define_table('restaurants',
+    Field('ownerID'),                 # Each restaurant has an owner, the ID of a particular user account.
     Field('name', required=True),
     Field('email'),
     Field('phone', required=True),
@@ -24,11 +25,14 @@ db.define_table('restaurants',
     Field('hoursId'), #db.hours.id),
     Field('culinaryStyle'),           # Should we limit options? Make a set of available culinary Style-reference culinary Styles in seamless app
     Field('description', 'text'),
-    Field('priceRange'),   # We should pull this from outside source--not from user
+    Field('priceRange'),              # We should pull this from outside source--not from user
     # I DONT THINNK WE NEED NEXT TWO, menu table references restaurantID and each dish has its own image in the menu table
     #Field('menu'),
     #Field('images')
     )
+db.restaurants.ownerID.readable = db.restaurants.ownerID.writable = False
+db.restaurants.addressId.readable = db.restaurants.addressId.writable = False
+db.restaurants.hoursId.readable = db.restaurants.hoursId.writable = False
 
 # I suspect we don't actually need a separate users table, my bad. - Sam
 db.define_table('users',
@@ -52,12 +56,14 @@ db.define_table('menuItems',
     Field('tagCount'), # Dishes are limited to 5 tags. This wont be too hard, for each menuItem we just need to check how many Tags get returned for a given menuID query.
                        # If 5 are found, we prevent the restaurant owner from adding more. If more than 5 are found, we can just trim off tags arbitrarily.
     )
+db.menuItems.restaurantID.readable = db.menuItems.restaurantID.writable = False
 
 # Each element of menuTags is a short, textual tag belonging to a single menuItem. To build a list of tags, query menuTags for a given menuItem tag.
 db.define_table('menuTags',
     Field('menuID'),
     Field('tag'),
     )
+db.menuTags.menuID.readable = db.menuTags.menuID.writable = False
 
 STATES = ['Alabama', 'Alaska','Arizona', 'Arkansas', 'California','Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine','Maryland','Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota','Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington','West Virginia', 'Wisconsin', 'Wyoming']
 
