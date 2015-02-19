@@ -13,6 +13,9 @@ db.define_table('hours',
     Field('enter something here')
 )
 
+# Just a random partial list of restaurant culinary styles that can be used for the culinaryStyle list.
+STYLES = ['American', 'Chinese', 'Japanse', 'Korean', 'Vietnamese', 'Mongolian', 'Mexican', 'Cuban', 'Indian', 'British', 'French', 'Italian', 'German']
+
 db.define_table('restaurants',
     Field('name', required=True),
     Field('email'),
@@ -40,7 +43,7 @@ db.define_table('users',
 
 # Each menuItem describes a single menu item. It includes the ID of the restaurant that owns it. A restaurant menu is formed by querying the menuItem table for all items
 # matching the appropriate ID. This cuts down on the number of sub-tables required.
-db.define_table('menuItem',
+db.define_table('menuItems',
     Field('restaurantID'),
     Field('dishName', required = True),
     Field('description', required = True),
@@ -50,9 +53,9 @@ db.define_table('menuItem',
                        # If 5 are found, we prevent the restaurant owner from adding more. If more than 5 are found, we can just trim off tags arbitrarily.
     )
 
-#holds all tags for all dishes 
+# Each element of menuTags is a short, textual tag belonging to a single menuItem. To build a list of tags, query menuTags for a given menuItem tag.
 db.define_table('menuTags',
-    Field('menuID'), #db.menu.id),
+    Field('menuID'),
     Field('tag'),
     )
 
