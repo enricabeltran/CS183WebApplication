@@ -1,3 +1,36 @@
 {{extend 'layout.html'}}
-<h1>This is the default/manage.html template</h1>
-{{=BEAUTIFY(response._vars)}}
+<h1>Managing {{=name}}...</h1>
+<p>{{=desc}}</p>
+<table>
+    <h4>Contact Info:</h4>
+    <tr>
+        <td>Phone Number:</td>
+        <td>{{=phone}}</td>
+    </tr>
+    <tr>
+        <td>Email:</td>
+        <td>{{=email}}</td>
+    </tr>
+</table>
+
+{{if len(menu) == 0:}}
+    <h4>Uh Oh! You haven't set up a menu for this restaurant yet.</h4>
+{{else:}}
+    <h4>Menu:</h4>
+    <table>
+    {{for i in range(0, len(menu)):}}
+        <tr>
+            <td>{{=menu[i].dishName}}</td>
+            <td>...</td>
+            <td>{{=menu[i].price}}</td>
+            <td>Edit</td>
+            <td>Delete</td>
+            <td>Add Tag</td>
+        </tr>
+    {{pass}}
+    </table>
+{{pass}}
+
+{{=newMenuItemButton}}
+<br>
+{{=cancelButton}}

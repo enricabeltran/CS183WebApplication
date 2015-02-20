@@ -132,6 +132,7 @@ def manage():
     phone = ''
     desc = ''
     menu = ''
+    restID = -1
 
     restaurant = db(db.restaurants.id == request.args(0)).select().first()
     if restaurant is not None:
@@ -140,9 +141,39 @@ def manage():
         phone = restaurant.phone
         desc = restaurant.description
         menu = db(db.menuItems.restaurantID == request.args(0)).select()
+        restID = restaurant.id
 
+    newMenuItemButton = A('Create a New Menu Item', _class='btn', _href=URL('default', 'createMenuItem', args=[restID]))
     cancelButton = A('Return To Restaurants', _class='btn', _href=URL('default', 'restaurants'))
-    return dict(name=name, email=email, phone=phone, desc=desc, menu=menu, cancelButton=cancelButton)
+    return dict(name=name, email=email, phone=phone, desc=desc, menu=menu, restID=restID, newMenuItemButton=newMenuItemButton, cancelButton=cancelButton)
+
+def createMenuItem():
+    if(auth.user.accountType == 'User'):
+        redirect(URL('default', 'main'))
+
+    form = SQLFORM.factory(Field('dishName',
+                                 label='Item Name',
+                                 ),
+                           Field('description', 'text',
+                                 label='Item Description',
+                                 ),
+                           Field('price',
+                                 label='Price',
+                                 ),
+                           Field('image',
+                                 label='Picture',
+                                 ),
+                          )
+    if form.process().accepted:
+        db.menuItems.insert(restaurantID = request.args(0),
+                            dishName = form.vars.dishName,
+                            description = form.vars.description,
+                            price = form.vars.price,
+                            image = form.vars.image,
+                           )
+        redirect(URL('default', 'manage', args=[request.args(0)]))
+
+    return dict(form=form)
 
 def main():
     if(auth.user.accountType == 'Restaurant Representative'):
