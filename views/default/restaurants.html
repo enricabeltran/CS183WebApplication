@@ -4,8 +4,15 @@
 {{if len(ownedRestaurants) == 0:}}
     <p>You don't currently own any restaurants</p>
 {{else:}}
+    <h4>Restaurants You Own:</h2>
+    <table>
     {{for i in range(0, len(ownedRestaurants)):}}
-        <p>Manage {{=ownedRestaurants[i].name}} {{=A('Disown This Restaurant', _class='btn', _href=URL('default', 'deleteRest', args = [ownedRestaurants[i].id]))}}</p>
+        <tr>
+            <td>{{=ownedRestaurants[i].name}}</td>
+            <td>{{=A('Manage', _class='btn', _href=URL('default', 'manage', args = [ownedRestaurants[i].id]))}}</td>
+            <td>{{=A('Disown', _class='btn', _href=URL('default', 'deleteRest', args = [ownedRestaurants[i].id]))}}</td>
+        </tr>
     {{pass}}
+    </table>
 {{pass}}
 {{=addRestaurantButton}}

@@ -85,6 +85,9 @@ def restaurants():
     return dict(ownedRestaurants=ownedRestaurants, ownerName=ownerName, addRestaurantButton=addRestaurantButton)
 
 def addRest():
+    if(auth.user.accountType == 'User'):
+        redirect(URL('default', 'main'))
+
     form = SQLFORM.factory(Field('name',
                                  label='Restaurant Name',
                                  ),
@@ -111,8 +114,34 @@ def addRest():
 
 @auth.requires_login()
 def deleteRest():
+    if(auth.user.accountType == 'User'):
+        redirect(URL('default', 'main'))
+
     db(db.restaurants.id == request.args(0)).delete()
     redirect(URL('default', 'restaurants'))
+
+# Controller for managing a restaurant
+@auth.requires_login()
+def manage():
+    if(auth.user.accountType == 'User'):
+        redirect(URL('default', 'main'))
+
+    name = ''
+    email = ''
+    phone = ''
+    desc = ''
+    menu = ''
+
+    restaurant = db(db.restaurants.id == request.args(0)).select().first()
+    if restaurant is not None:
+        name = restaurant.name
+        email = restaurant.email
+        phone = restaurant.phone
+        desc = restaurant.description
+        menu = db(db.menuItems.restaurantID == request.args(0)).select()
+
+    cancelButton = A('Return To Restaurants', _class='btn', _href=URL('default', 'restaurants'))
+    return dict(name=name, email=email, phone=phone, desc=desc, menu=menu, cancelButton=cancelButton)
 
 def main():
     if(auth.user.accountType == 'Restaurant Representative'):
