@@ -15,6 +15,7 @@ def index():
     startAsUser = ''
     
     #BRANDON, instead of doing a form in index to fill out the restaurants/users table, should i move it to a different URL so your index CSS works correctly for all cases?
+	#ENRICA, I think it should be fine with the way you have it. I haven't even touched the master CSS yet, all my work has been through 'cover.css'. I'll try to work around it.
     
     #if user/rep is logged in
     if(auth.user != None):
