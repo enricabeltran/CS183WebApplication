@@ -49,19 +49,19 @@ db.define_table('users',
 # matching the appropriate ID. This cuts down on the number of sub-tables required.
 db.define_table('menuItems',
     Field('restaurantID'),
-    Field('dishName', required = True),
-    Field('description', required = True),
-    Field('price', required = True),
+    Field('dishName', requires = IS_NOT_EMPTY()),
+    Field('description', 'text', requires = IS_NOT_EMPTY()),
+    Field('price', requires = IS_FLOAT_IN_RANGE(0, 1000)),
     Field('image', 'upload'),
-    Field('tagCount'), # Dishes are limited to 5 tags. This wont be too hard, for each menuItem we just need to check how many Tags get returned for a given menuID query.
-                       # If 5 are found, we prevent the restaurant owner from adding more. If more than 5 are found, we can just trim off tags arbitrarily.
     )
 db.menuItems.restaurantID.readable = db.menuItems.restaurantID.writable = False
 
 # Each element of menuTags is a short, textual tag belonging to a single menuItem. To build a list of tags, query menuTags for a given menuItem tag.
+# Dishes are limited to 5 tags. This wont be too hard, for each menuItem we just need to check how many Tags get returned for a given menuID query.
+# If 5 are found, we prevent the restaurant owner from adding more. If more than 5 are found, we can just trim off tags arbitrarily.
 db.define_table('menuTags',
     Field('menuID'),
-    Field('tag'),
+    Field('tag', requires = IS_NOT_EMPTY()),
     )
 db.menuTags.menuID.readable = db.menuTags.menuID.writable = False
 
@@ -74,3 +74,12 @@ db.users.email.requires = IS_EMAIL()
 
 db.restaurants.phone.requires = IS_MATCH('^1?(-?\d{3}-?|\(\d{3}\))\d{3}-?\d{4}$', error_message="Not a valid phone number")
 db.restaurants.email.requires = IS_EMAIL()
+
+# Taggable returns true if and only if the menuItem associated with the passed-in ID has less than 5 associated tags.
+def taggable(menuItemID):
+    taggable = False
+
+    if len(db(db.menuTags.menuID == menuItemID).select()) < 5:
+        taggable = True
+
+    return taggable

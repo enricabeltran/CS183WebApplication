@@ -133,6 +133,7 @@ def manage():
     desc = ''
     menu = ''
     restID = -1
+    tags = []
 
     restaurant = db(db.restaurants.id == request.args(0)).select().first()
     if restaurant is not None:
@@ -151,18 +152,10 @@ def createMenuItem():
     if(auth.user.accountType == 'User'):
         redirect(URL('default', 'main'))
 
-    form = SQLFORM.factory(Field('dishName',
-                                 label='Item Name',
-                                 ),
-                           Field('description', 'text',
-                                 label='Item Description',
-                                 ),
-                           Field('price',
-                                 label='Price',
-                                 ),
-                           Field('image',
-                                 label='Picture',
-                                 ),
+    form = SQLFORM.factory(Field('dishName', requires = IS_NOT_EMPTY()),
+                           Field('description', 'text', requires = IS_NOT_EMPTY()),
+                           Field('price', requires = IS_FLOAT_IN_RANGE(0, 1000)),
+                           Field('image', 'upload'),
                           )
     if form.process().accepted:
         db.menuItems.insert(restaurantID = request.args(0),
@@ -171,9 +164,37 @@ def createMenuItem():
                             price = form.vars.price,
                             image = form.vars.image,
                            )
+
         redirect(URL('default', 'manage', args=[request.args(0)]))
 
-    return dict(form=form)
+    cancelButton = A('Cancel', _class='btn', _href=URL('default', 'manage', args = [request.args(0)]))
+
+    return dict(form=form, cancelButton=cancelButton)
+
+def deleteMenuItem():
+    if(auth.user.accountType == 'User'):
+        redirect(URL('default', 'main'))
+
+    db(db.menuItems.id == request.args(0)).delete()
+
+    redirect(URL('default', 'manage', args = [request.args(1)]))
+
+def tag():
+    if(auth.user.accountType == 'User'):
+        redirect(URL('default', 'main'))
+
+    form = SQLFORM.factory(Field('tag', requires = IS_NOT_EMPTY()),
+                          )
+    if form.process().accepted:
+        db.menuTags.insert(menuID = request.args(0),
+                           tag = form.vars.tag,
+                          )
+
+        redirect(URL('default', 'manage', args=[request.args(1)]))
+
+    cancelButton = A('Cancel', _class='btn', _href=URL('default', 'manage', args = [request.args(1)]))
+
+    return dict(form=form, cancelButton=cancelButton)
 
 def main():
     if(auth.user.accountType == 'Restaurant Representative'):

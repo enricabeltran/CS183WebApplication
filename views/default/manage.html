@@ -23,9 +23,21 @@
             <td>{{=menu[i].dishName}}</td>
             <td>...</td>
             <td>{{=menu[i].price}}</td>
-            <td>Edit</td>
-            <td>Delete</td>
-            <td>Add Tag</td>
+            <td>{{=A('Edit', _class='btn', _href=URL('default', 'editMenuItem', args=[menu[i].id]))}}</td>
+            <td>{{=A('Delete', _class='btn', _href=URL('default', 'deleteMenuItem', args=[menu[i].id, restID]))}}</td>
+            {{if taggable(menu[i].id):}}
+                <td>{{=A('Add Tag', _class='btn', _href=URL('default', 'tag', args=[menu[i].id, restID]))}}</td>
+            {{pass}}
+        </tr>
+        {{tags = db(db.menuTags.menuID == menu[i].id).select()}}
+        <tr>
+            <td>
+                <p>
+                {{for i in range(0, len(tags)):}}
+                    {{=tags[i].tag}},
+                {{pass}}
+                </p>
+            </td>
         </tr>
     {{pass}}
     </table>
