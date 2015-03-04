@@ -51,10 +51,12 @@ plugins = PluginManager()
 
 ACCOUNTTYPE = ['User', 'Restaurant Representative']
 
-#tells us if a particular user account is a user/rep and if info been added to the db.restaurants/db.users tables for this account 
+#addresses table in tables.py is linked to this db.auth
 auth.settings.extra_fields['auth_user']= [
     Field('infoObtained', 'boolean', default = False),
-    Field('accountType', writable=False, required=True)]
+    Field('accountType', writable=False, required=True),
+    Field('phone'),
+]
 
 ## create all tables needed by auth if not custom tables
 auth.define_tables(username=False, signature=False)
