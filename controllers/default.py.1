@@ -1,4 +1,3 @@
-import os
 # -*- coding: utf-8 -*-
 # this file is released under public domain and you can use without limitations
 
@@ -14,7 +13,7 @@ def index():
     form = ''
     startAsRestaurant = ''
     startAsUser = ''
-
+    
     #if user/rep is logged in
     if(auth.user != None):
         if(db.auth_user.accountType == 'User'):
@@ -27,7 +26,7 @@ def index():
     return dict(startAsRestaurant=startAsRestaurant, startAsUser=startAsUser, form=form)
 
 def login():
-
+    
     destination = 'error'
     form = ''
     register = False
@@ -47,7 +46,7 @@ def login():
     elif (request.args(0) and request.args(0) == 'restaurant'):
         form = auth.login()
         destination = 'restaurants'
-
+        
     return dict(destination=destination, form=form, register=register)
 
 
@@ -83,7 +82,7 @@ def addRest():
                           )
     if form.process().accepted:
         db.restaurants.insert(ownerID = auth.user.id,
-                               restaurantName = form.vars.restaurantName,
+                               restaurantName = form.vars.name,
                                phone = form.vars.phone,
                                email = form.vars.email,
                                description = form.vars.description,
@@ -116,7 +115,7 @@ def manage():
 
     restaurant = db(db.restaurants.id == request.args(0)).select().first()
     if restaurant is not None:
-        name = restaurant.restaurantName
+        name = restaurant.name
         email = restaurant.email
         phone = restaurant.phone
         desc = restaurant.description
@@ -131,11 +130,10 @@ def createMenuItem():
     if(auth.user.accountType == 'User'):
         redirect(URL('default', 'main'))
 
-
     form = SQLFORM.factory(Field('dishName', requires = IS_NOT_EMPTY()),
                            Field('description', 'text', requires = IS_NOT_EMPTY()),
                            Field('price', requires = IS_FLOAT_IN_RANGE(0, 1000)),
-                           Field('image', 'upload', uploadfolder=os.path.join(request.folder,'uploads/temp'))
+                           Field('image', 'upload'),
                           )
     if form.process().accepted:
         db.menuItems.insert(restaurantID = request.args(0),
@@ -151,34 +149,9 @@ def createMenuItem():
 
     return dict(form=form, cancelButton=cancelButton)
 
-def editMenuItem():
-    if(auth.user.accountType == 'User'):
-        redirect(URL('default', 'main'))
-    #ADD CODE TO VERIFY THAT THE USER OWNS THIS MENU ITEM
-    dish = db(db.menuItems.id == request.args(1)).select().first() #item to be edited
-    
-    form = SQLFORM.factory(Field('dishName', requires = IS_NOT_EMPTY(), default=dish.dishName),
-                           Field('description', 'text', requires = IS_NOT_EMPTY(), default=dish.description),
-                           Field('price', requires = IS_FLOAT_IN_RANGE(0, 1000), default= dish.price),
-                           Field('image', 'upload', uploadfolder=os.path.join(request.folder,'uploads/editTemp'))
-                          )
-    if form.process().accepted:
-        db(db.menuItems._id==dish.id).update(dishName = form.vars.dishName,
-                            description = form.vars.description,
-                            price = form.vars.price,
-                            image = form.vars.image,
-                           )
-        redirect(URL('default', 'manage', args=[request.args(0)]))
-
-    cancelButton = A('Cancel', _class='btn', _href=URL('default', 'manage', args = [request.args(0)]))
-
-    return dict(form=form, cancelButton=cancelButton)
-
 def deleteMenuItem():
     if(auth.user.accountType == 'User'):
         redirect(URL('default', 'main'))
-
-    #ADD CODE TO VERIFY THAT THE USER OWNS THIS MENU ITEM
 
     db(db.menuItems.id == request.args(0)).delete()
 
@@ -244,7 +217,7 @@ def call():
     return service()
 
 
-@auth.requires_login()
+@auth.requires_login() 
 def api():
     """
     this is example of API with access control

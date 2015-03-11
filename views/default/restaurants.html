@@ -8,7 +8,7 @@
     <table>
     {{for i in range(0, len(ownedRestaurants)):}}
         <tr>
-            <td>{{=ownedRestaurants[i].name}}</td>
+            <td>{{=ownedRestaurants[i].restaurantName}}</td>
             <td>{{=A('Manage', _class='btn', _href=URL('default', 'manage', args = [ownedRestaurants[i].id]))}}</td>
             <td>{{=A('Disown', _class='btn', _href=URL('default', 'deleteRest', args = [ownedRestaurants[i].id]))}}</td>
         </tr>
