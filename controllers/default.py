@@ -133,11 +133,24 @@ def createMenuItem():
     if(auth.user.accountType == 'User'):
         redirect(URL('default', 'main'))
 
+    restaurantName = db(db.restaurants.id == request.args(0)).select(db.restaurants.restaurantName).first().restaurantName
 
-    form = SQLFORM.factory(Field('dishName', requires = IS_NOT_EMPTY()),
-                           Field('description', 'text', requires = IS_NOT_EMPTY()),
-                           Field('price', requires = IS_FLOAT_IN_RANGE(0, 1000)),
-                           Field('image', 'upload', uploadfolder=os.path.join(request.folder,'uploads/temp'))
+    form = SQLFORM.factory(Field('dishName',
+                                 label='Dish Name',
+                                 requires = IS_NOT_EMPTY()
+                                ),
+                           Field('description', 'text',
+                                 label='Description',
+                                 requires = IS_NOT_EMPTY()
+                                ),
+                           Field('price',
+                                 label='Price',
+                                 requires = IS_FLOAT_IN_RANGE(0, 1000)
+                                ),
+                           Field('image', 'upload', uploadfolder=os.path.join(request.folder,'uploads/temp'),
+                                 label='Picture of Dish',
+                                 requires = IS_EMPTY_OR(IS_IMAGE()),
+                                )
                           )
     if form.process().accepted:
         db.menuItems.insert(restaurantID = request.args(0),
@@ -151,18 +164,34 @@ def createMenuItem():
 
     cancelButton = A('Cancel', _class='btn', _href=URL('default', 'manage', args = [request.args(0)]))
 
-    return dict(form=form, cancelButton=cancelButton)
+    return dict(form=form, cancelButton=cancelButton, restaurantName=restaurantName)
 
 def editMenuItem():
     if(auth.user.accountType == 'User'):
         redirect(URL('default', 'main'))
     #ADD CODE TO VERIFY THAT THE USER OWNS THIS MENU ITEM
     dish = db(db.menuItems.id == request.args(1)).select().first() #item to be edited
-    
-    form = SQLFORM.factory(Field('dishName', requires = IS_NOT_EMPTY(), default=dish.dishName),
-                           Field('description', 'text', requires = IS_NOT_EMPTY(), default=dish.description),
-                           Field('price', requires = IS_FLOAT_IN_RANGE(0, 1000), default= dish.price),
-                           Field('image', 'upload', uploadfolder=os.path.join(request.folder,'uploads/editTemp'))
+
+    form = SQLFORM.factory(Field('dishName',
+                                 requires = IS_NOT_EMPTY(),
+                                 label = 'Dish Name',
+                                 default=dish.dishName,
+                                ),
+                           Field('description', 'text',
+                                 requires = IS_NOT_EMPTY(),
+                                 label = 'Description',
+                                 default=dish.description,
+                                ),
+                           Field('price',
+                                 requires = IS_FLOAT_IN_RANGE(0, 1000),
+                                 label = 'Price',
+                                 default= dish.price,
+                                ),
+                           Field('image', 'upload', uploadfolder=os.path.join(request.folder,'uploads/editTemp'),
+                                 label = 'Picture of Dish',
+                                 requires = IS_EMPTY_OR(IS_IMAGE()),
+                                 default= dish.image,
+                                )
                           )
     if form.process().accepted:
         db(db.menuItems._id==dish.id).update(dishName = form.vars.dishName,
@@ -174,7 +203,7 @@ def editMenuItem():
 
     cancelButton = A('Cancel', _class='btn', _href=URL('default', 'manage', args = [request.args(0)]))
 
-    return dict(form=form, cancelButton=cancelButton)
+    return dict(form=form, cancelButton=cancelButton, dish=dish)
 
 def deleteMenuItem():
     if(auth.user.accountType == 'User'):
