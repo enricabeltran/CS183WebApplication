@@ -53,7 +53,6 @@ ACCOUNTTYPE = ['User', 'Restaurant Representative']
 
 #addresses table in tables.py is linked to this db.auth
 auth.settings.extra_fields['auth_user']= [
-    Field('infoObtained', 'boolean', default = False),
     Field('accountType', writable=True, required=True),
     Field('phone'),
 ]

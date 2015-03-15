@@ -233,10 +233,40 @@ def tag():
     return dict(form=form, cancelButton=cancelButton)
 
 def main():
-    #if(auth.user.accountType == 'Restaurant Representative'):
-    #    redirect(URL('default', 'restaurants'))
+    if(auth.user.accountType == 'Restaurant Representative'):
+        redirect(URL('default', 'restaurants'))
 
     return dict()
+
+#This page will display the public info for a restaurant
+#This page will navigate to an ordering page 
+def restaurantPage():
+    #args(0) is the restaurant_id
+    #args(1) is optional--menu_id from which the user navigated from 
+
+    restaurant = db(db.restaurants.id == request.args(0)).select().first()
+
+
+    name = ''
+    email = ''
+    phone = ''
+    desc = ''
+    menu = ''
+    restID = -1
+    tags = []
+
+    if restaurant is not None:
+        name = restaurant.restaurantName
+        email = restaurant.email
+        phone = restaurant.phone
+        desc = restaurant.description
+        menu = db(db.menuItems.restaurantID == request.args(0)).select()
+        restID = restaurant.id
+
+    cancelButton = A('Return To Main Page', _class='btn', _href=URL('default', 'main'))
+
+    return dict(name=name, email=email, phone=phone, desc=desc, menu=menu, restID=restID, cancelButton=cancelButton)
+
 
 def user():
     """
