@@ -1,8 +1,12 @@
 {{extend 'layout.html'}}
 <h1>Managing {{=name}}...</h1>
-<p>{{=desc}}</p>
+<p>{{=desc}}{{=A("Edit", _class='btn', _id="editDescButton")}}</p>
+<div id ="editDesc">
+    {{=editDescForm}}
+    {{=A("Cancel Edit", _class='btn', _id="editDescCancel")}}
+</div>
 <table>
-    <h4>Contact Info:</h4>
+    <h4>Contact Info:{{=A("Edit", _class='btn', _id="editContactButton")}}</h4>
     <tr>
         <td>Phone Number:</td>
         <td>{{=phone}}</td>
@@ -12,6 +16,10 @@
         <td>{{=email}}</td>
     </tr>
 </table>
+<div id ="editContact">
+    {{=editContactForm}}
+    {{=A("Cancel Edit", _class='btn', _id="editContactCancel")}}
+</div>
 
 {{if len(menu) == 0:}}
     <h4>Uh Oh! You haven't set up a menu for this restaurant yet.</h4>
@@ -46,3 +54,21 @@
 {{=newMenuItemButton}}
 <br>
 {{=cancelButton}}
+
+<script>
+    jQuery("#editDesc").hide();
+    jQuery("#editDescCancel").click(function(){
+        $("#editDesc").fadeOut();
+    });
+    jQuery("#editDescButton").click(function(){
+        $("#editDesc").fadeIn();
+    });
+
+    jQuery("#editContact").hide();
+    jQuery("#editContactCancel").click(function(){
+        $("#editContact").fadeOut();
+    });
+    jQuery("#editContactButton").click(function(){
+        $("#editContact").fadeIn();
+    });
+</script>
