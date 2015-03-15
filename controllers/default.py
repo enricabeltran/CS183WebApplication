@@ -73,9 +73,11 @@ def addRest():
                                  ),
                            Field('phone',
                                  label='Business Phone',
+                                 requires = IS_MATCH('^1?(-?\d{3}-?|\(\d{3}\))\d{3}-?\d{4}$', error_message="Enter a phone number as '(XXX)XXX-XXXX'. Country code is optional.")
                                  ),
                            Field('email',
                                  label='Business Email',
+                                 requires = IS_EMAIL()
                                  ),
                            Field('description', 'text',
                                  label='Restaurant Description',
