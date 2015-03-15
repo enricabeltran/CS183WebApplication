@@ -1,0 +1,50 @@
+{{extend 'layout.html'}}
+<h1>{{=name}}</h1>
+
+<div id="gallery">
+    {{for i in range(0, len(menu)):}}
+        <img data-src= "{{=menu[i].image}}" /> <!--how???-->
+    {{pass}}
+</div>
+
+<p>{{=desc}}</p>
+<table>
+    <h4>Contact Info:</h4>
+    <tr>
+        <td>Phone Number:</td>
+        <td>{{=phone}}</td>
+    </tr>
+    <tr>
+        <td>Email:</td>
+        <td>{{=email}}</td>
+    </tr>
+</table>
+
+{{if len(menu) == 0:}}
+    <h4>Uh Oh! This restaurant does not have a menu yet.</h4>
+{{else:}}
+    <h4>Menu:</h4>
+    <table>
+    {{for i in range(0, len(menu)):}}
+        <tr>
+            <td>{{=menu[i].dishName}}</td>
+            <td>...</td>
+            <td>{{=menu[i].description}}</td>
+            <td>{{=menu[i].price}}</td>
+        </tr>
+        {{tags = db(db.menuTags.menuID == menu[i].id).select()}}
+        <tr>
+            <td>Tags:
+                <p>
+                {{for i in range(0, len(tags)):}}
+                    {{=tags[i].tag}},
+                {{pass}}
+                </p>
+            </td>
+        </tr>
+    {{pass}}
+    </table>
+{{pass}}
+
+<br>
+{{=cancelButton}}

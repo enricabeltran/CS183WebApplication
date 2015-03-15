@@ -62,6 +62,7 @@ db.define_table('menuItems',
     Field('restaurantID', db.restaurants),
     Field('dishName', requires = IS_NOT_EMPTY()),
     Field('description', 'text', requires = IS_NOT_EMPTY()),
+    Field('category', 'text'),
     Field('price', requires = IS_FLOAT_IN_RANGE(0, 1000)),
     Field('image', 'upload'),
     )
