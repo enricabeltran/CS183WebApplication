@@ -54,7 +54,7 @@ ACCOUNTTYPE = ['User', 'Restaurant Representative']
 #addresses table in tables.py is linked to this db.auth
 auth.settings.extra_fields['auth_user']= [
     Field('infoObtained', 'boolean', default = False),
-    Field('accountType', writable=False, required=True),
+    Field('accountType', writable=True, required=True),
     Field('phone'),
 ]
 
@@ -62,7 +62,7 @@ auth.settings.extra_fields['auth_user']= [
 auth.define_tables(username=False, signature=False)
 
 #WHY DOES THIS NOT CREATE A DROP DOWN IN AUTH.REGISTER PAGE
-db.auth_user.accountType.required = IS_IN_SET(ACCOUNTTYPE)
+db.auth_user.accountType.requires = IS_IN_SET(ACCOUNTTYPE)
 
 ## configure email
 mail = auth.settings.mailer
