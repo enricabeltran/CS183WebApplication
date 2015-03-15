@@ -64,6 +64,7 @@ def restaurants():
 
     return dict(ownedRestaurants=ownedRestaurants, ownerName=ownerName, addRestaurantButton=addRestaurantButton)
 
+@auth.requires_login()
 def addRest():
     if(auth.user.accountType == 'User'):
         redirect(URL('default', 'main'))
@@ -129,6 +130,7 @@ def manage():
     cancelButton = A('Return To Restaurants', _class='btn', _href=URL('default', 'restaurants'))
     return dict(name=name, email=email, phone=phone, desc=desc, menu=menu, restID=restID, newMenuItemButton=newMenuItemButton, cancelButton=cancelButton)
 
+@auth.requires_login()
 def createMenuItem():
     if(auth.user.accountType == 'User'):
         redirect(URL('default', 'main'))
@@ -166,6 +168,7 @@ def createMenuItem():
 
     return dict(form=form, cancelButton=cancelButton, restaurantName=restaurantName)
 
+@auth.requires_login()
 def editMenuItem():
     if(auth.user.accountType == 'User'):
         redirect(URL('default', 'main'))
@@ -205,6 +208,7 @@ def editMenuItem():
 
     return dict(form=form, cancelButton=cancelButton, dish=dish)
 
+@auth.requires_login()
 def deleteMenuItem():
     if(auth.user.accountType == 'User'):
         redirect(URL('default', 'main'))
@@ -215,6 +219,7 @@ def deleteMenuItem():
 
     redirect(URL('default', 'manage', args = [request.args(1)]))
 
+@auth.requires_login()
 def tag():
     if(auth.user.accountType == 'User'):
         redirect(URL('default', 'main'))
