@@ -135,7 +135,8 @@ def manage():
     desc = ''
     menu = ''
     restID = -1
-    tags = []
+    tags = [] # I'm not sure this is even used... -Sam
+    tagForms = []
 
     restaurant = db(db.restaurants.id == request.args(0)).select().first()
     address = db(db.addresses.id == restaurant.addressID).select().first()
@@ -198,7 +199,17 @@ def manage():
         if editContactForm.process(formname='editContactForm').accepted:
             restaurant.update_record(phone=editContactForm.vars.phone, email=editContactForm.vars.email)
             redirect(URL('default', 'manage', args=[request.args(0)]))
-
+        # Finally, let's generate an 'addTag' form for each menu item...
+        for i in range(0, len(menu)):
+            tempForm = SQLFORM.factory(Field('tag', requires = IS_NOT_EMPTY()),
+                                      )
+            if tempForm.process(formname='tagForm'+str(i)).accepted:
+                db.menuTags.insert(menuID = menu[i].id,
+                                   tag = tempForm.vars.tag,
+                                  )
+                redirect(URL('default', 'manage', args=[request.args(0)]))
+            tagForms.append(tempForm)
+            
     newMenuItemButton = A('Create a New Menu Item', _class='btn', _href=URL('default', 'createMenuItem', args=[restID]))
     cancelButton = A('Return To Restaurants', _class='btn', _href=URL('default', 'restaurants'))
     return dict(name=name,
@@ -212,7 +223,7 @@ def manage():
                 editDescForm=editDescForm,
                 editContactForm=editContactForm,
                 address=address,
-                editAddressForm=editAddressForm
+                editAddressForm=editAddressForm,
                 tagForms=tagForms,
                )
 
