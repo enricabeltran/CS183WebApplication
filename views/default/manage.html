@@ -6,21 +6,22 @@
     {{=A("Cancel Edit", _class='btn', _id="editDescCancel")}}
 </div>
 
-<p><table>
-    <tr>
-        <td> <i>Address: </i></p></td>
-        <td> {{=address.streetAddress if address is not None else ''}}</td>
-    </tr>
-    <tr>
-        <td> </td>
-        <td>
-            {{=address.city if address is not None else ''}}, {{=address.usState if address is not None else ''}} {{=address.zipCode if address is not None else ''}}
-        </td>
-    </tr>
-</table>{{=A("Edit", _class='btn', _id="editAddressButton")}} </p>
+<p>
+    <table>
+        <h3>Address:{{=A("Edit", _class='btn', _id="editAddressButton")}}</h3>
+        <tr>
+            <td> {{=address.streetAddress if address is not None else ''}}</td>
+        </tr>
+        <tr>
+            <td>
+                {{=address.city if address is not None else ''}}, {{=address.usState if address is not None else ''}} {{=address.zipCode if address is not None else ''}}
+            </td>
+        </tr>
+    </table>
+</p>
 <div id = "editAddress">
     {{=editAddressForm}}
-    {{=A("Cancel Edit", _class='btn', _id="editDescCancel")}}
+    {{=A("Cancel Edit", _class='btn', _id="editAddressCancel")}}
 </div>
 
 <table>
@@ -102,7 +103,6 @@
 
 <script>
     jQuery("#editDesc").hide();
-    jQuery("#editAddress").hide();
     jQuery("#editDescCancel").click(function(){
         $("#editDesc").fadeOut();
     });
@@ -117,10 +117,12 @@
     jQuery("#editContactButton").click(function(){
         $("#editContact").fadeIn();
     });
-    jQuery("editAddressButton").click(function(){
+
+    jQuery("#editAddress").hide();
+    jQuery("#editAddressButton").click(function(){
         $("#editAddress").fadeIn();
     });
-    jQuery("editAddressButton").click(function(){
+    jQuery("#editAddressCancel").click(function(){
         $("#editAddress").fadeOut();
     });
 </script>

@@ -147,6 +147,7 @@ def manage():
         desc = restaurant.description
         menu = db(db.menuItems.restaurantID == request.args(0)).select()
         restID = restaurant.id
+        address = db(db.addresses.restaurantID == restID).select().first()
 
         editDescForm = SQLFORM.factory(Field('description', 'text',
                                              requires = IS_NOT_EMPTY(),
@@ -160,29 +161,40 @@ def manage():
         editDescForm.elements('.w2p_fl', replace=None) # This removes the auto-generated labels from the form fields
         editAddressForm = SQLFORM.factory(Field('streetAddress',
                                  label = 'Address',
+                                 default = address.streetAddress,
                                  requires = IS_NOT_EMPTY(),
                                  ),
                            Field('city',
                                  label = 'City',
+                                 default = address.city,
                                  requires = IS_NOT_EMPTY(),
                                  ),
                            Field('zipCode',
                                  label = 'Zip Code',
+                                 default = address.zipCode,
                                  requires = IS_NOT_EMPTY(),
                                 ),
                            Field('usState',
                                  label = 'U.S. State',
+                                 default = address.usState,
                                  requires = IS_IN_SET(STATES),
                                  ),
                        )
         if editAddressForm.process(formname='editAddressForm').accepted:
-            address.update_record(streetAddress = editAddressForm.vars.streetAddress,
-                                 city = editAddressForm.vars.city,
-                                 zipCode = editAddressForm.vars.zipCode,
-                                 usState = editAddressForm.vars.usState)
+            if address is not None:
+                address.update_record(streetAddress = editAddressForm.vars.streetAddress,
+                                     city = editAddressForm.vars.city,
+                                     zipCode = editAddressForm.vars.zipCode,
+                                     usState = editAddressForm.vars.usState)
+            else:
+                db.addresses.insert(streetAddress = editAddressForm.vars.streetAddress,
+                                    city = editAddressForm.vars.city,
+                                    zipCode = editAddressForm.vars.zipCode,
+                                    usState = editAddressForm.vars.usState,
+                                    userID = auth.user.id,
+                                    restaurantID = request.args(0),
+                                   )
             redirect(URL('default', 'manage', args=[request.args(0)]))
-
-        #editDescForm.elements('.w2p_fl', replace=None) # This removes the auto-generated labels from the form fields
 
         editContactForm = SQLFORM.factory(Field('phone',
                                                 label='New Business Phone',
@@ -209,7 +221,7 @@ def manage():
                                   )
                 redirect(URL('default', 'manage', args=[request.args(0)]))
             tagForms.append(tempForm)
-            
+
     newMenuItemButton = A('Create a New Menu Item', _class='btn', _href=URL('default', 'createMenuItem', args=[restID]))
     cancelButton = A('Return To Restaurants', _class='btn', _href=URL('default', 'restaurants'))
     return dict(name=name,
