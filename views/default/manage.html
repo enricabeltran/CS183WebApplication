@@ -66,10 +66,14 @@
             <th>Price</th>
         </tr>
         <tr>
-            <td><img src="{{=URL('download',args=menu[i].image)}}" style="height:100px; width:100px;"/></td>
+            <td>
+                {{if menu[i].image is not '':}}
+                <img src="{{=URL('download',args=menu[i].image)}}" style="height:100px; width:100px;"/>
+                {{pass}}
+            </td>
             <td>{{=menu[i].dishName}}</td>
             <td>...</td>
-            <td>{{=menu[i].price}}</td>
+            <td>{{='$' + "%0.2f" % float(menu[i].price)}}</td> <!-- This looks weird, but it makes price display as two decimal points -->
             <td>{{=A('Edit', _class='btn', _href=URL('default', 'editMenuItem', args=[restID, menu[i].id]))}}</td>
             <td>{{=A('Delete', _class='btn', _href=URL('default', 'deleteMenuItem', args=[menu[i].id, restID]))}}</td>
             {{if taggable(menu[i].id):}}
