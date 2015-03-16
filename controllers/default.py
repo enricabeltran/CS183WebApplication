@@ -69,8 +69,14 @@ def addRest():
 
     STATES = ['Alabama', 'Alaska','Arizona', 'Arkansas', 'California','Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine','Maryland','Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota','Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington','West Virginia', 'Wisconsin', 'Wyoming']
 
+    CUISINES = ['African', 'American', 'Argentinian', 'BBQ', 'Belgian', 'Brazilian', 'Breakfast/Brunch', 'Cajun and Creole', 'Cambodian', 'Caribbean', 'Chinese', 'Costa Rican', 'Cuban', 'Deli', 'Dessert', 'English', 'Filipino', 'French', 'German', 'Greek', 'Haitian', 'Halal', 'Hawaiian', 'Indian', 'Indonesian', 'Irish', 'Italian', 'Jamaican', 'Japanese', 'Juices', 'Korean', 'Kosher', 'Lebanese', 'Malaysian', 'Mediterranean', 'Mexican', 'Moroccan', 'Pakistani', 'Peruvian', 'Polish', 'Portuguese', 'Russian', 'Salads', 'Sandwiches/Wraps', 'Scandinavian', 'Seafood', 'Smoothies/Shakes', 'Southern and Soul', 'Spanish', 'Sri-Lankan', 'Steakhouse', 'Taiwanese', 'Thai', 'Turkish', 'Vegan/Vegetarian', 'Venezuelan', 'Vietnamese',]
+    
     form = SQLFORM.factory(Field('restaurantName',
                                  label='Restaurant Name',
+                                 ),
+                           Field('cuisineType',
+                                 label='Cuisine',
+                                 requires = IS_IN_SET(CUISINES)
                                  ),
                            Field('phone',
                                  label='Business Phone',
@@ -102,6 +108,7 @@ def addRest():
                           )
     if form.process().accepted:
         db.restaurants.insert(ownerID = auth.user.id,
+                               cuisineType = cuisineType,
                                restaurantName = form.vars.restaurantName,
                                phone = form.vars.phone,
                                email = form.vars.email,
@@ -322,6 +329,7 @@ def restaurantPage():
     phone = ''
     desc = ''
     menu = ''
+    cuisine = ''
     restID = -1
     tags = []
 
@@ -332,10 +340,11 @@ def restaurantPage():
         desc = restaurant.description
         menu = db(db.menuItems.restaurantID == request.args(0)).select(orderby=db.menuItems.category)
         restID = restaurant.id
+        cuisine = restaurant.cuisineType
 
     cancelButton = A('Return To Main Page', _class='btn', _href=URL('default', 'main'))
 
-    return dict(name=name, email=email, phone=phone, desc=desc, menu=menu, restID=restID, cancelButton=cancelButton)
+    return dict(cuisine=cuisine, name=name, email=email, phone=phone, desc=desc, menu=menu, restID=restID, cancelButton=cancelButton)
 
 
 def user():

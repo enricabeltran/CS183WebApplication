@@ -4,7 +4,8 @@ from datetime import datetime
 DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
 # Just a random partial list of restaurant culinary styles that can be used for the culinaryStyle list.
-STYLES = ['American', 'Chinese', 'Japanse', 'Korean', 'Vietnamese', 'Mongolian', 'Mexican', 'Cuban', 'Indian', 'British', 'French', 'Italian', 'German']
+CUISINES = ['African', 'American', 'Argentinian', 'BBQ', 'Belgian', 'Brazilian', 'Breakfast/Brunch', 'Cajun and Creole', 'Cambodian', 'Caribbean', 'Chinese', 'Costa Rican', 'Cuban', 'Deli', 'Dessert', 'English', 'Filipino', 'French', 'German', 'Greek', 'Haitian', 'Halal', 'Hawaiian', 'Indian', 'Indonesian', 'Irish', 'Italian', 'Jamaican', 'Japanese', 'Juices', 'Korean', 'Kosher', 'Lebanese', 'Malaysian', 'Mediterranean', 'Mexican', 'Moroccan', 'Pakistani', 'Peruvian', 'Polish', 'Portuguese', 'Russian', 'Salads', 'Sandwiches/Wraps', 'Scandinavian', 'Seafood', 'Smoothies/Shakes', 'Southern and Soul', 'Spanish', 'Sri-Lankan', 'Steakhouse', 'Taiwanese', 'Thai', 'Turkish', 'Vegan/Vegetarian', 'Venezuelan', 'Vietnamese',]
+
 
 STATES = ['Alabama', 'Alaska','Arizona', 'Arkansas', 'California','Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine','Maryland','Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota','Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington','West Virginia', 'Wisconsin', 'Wyoming']
 
@@ -16,7 +17,6 @@ db.define_table('addresses',
     Field('zipCode'),
     Field('usState'),
     Field('userID', db.auth_user),
-    Field('restaurantID'),
     )
 db.addresses.usState.requires = IS_IN_SET(STATES)
 
@@ -26,14 +26,14 @@ db.define_table('restaurants',
     Field('email', required=False),
     Field('phone', required=True),
     Field('addressID', db.addresses),
-    Field('culinaryStyle'),
+    Field('cuisineType'),
     Field('description', 'text'),
     Field('priceRange'),              # We should pull this from outside source--not from user
 
     )
 db.restaurants.ownerID.readable = db.restaurants.ownerID.writable = False
 db.restaurants.addressID.readable = db.restaurants.addressID.writable = False
-db.restaurants.culinaryStyle.requires = IS_IN_SET(STYLES)
+db.restaurants.cuisineType.requires = IS_IN_SET(CUISINES)
 db.restaurants.phone.requires = IS_MATCH('^1?(-?\d{3}-?|\(\d{3}\))\d{3}-?\d{4}$', error_message="Not a valid phone number")
 db.restaurants.email.requires = IS_EMAIL()
 
