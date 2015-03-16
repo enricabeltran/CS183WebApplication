@@ -89,3 +89,16 @@ def taggable(menuItemID):
         taggable = True
 
     return taggable
+
+# VERIFY_IS_RESTAURANT and VERIFY_IS_USER can be used to quickly determine whether a user is of the restaurant type or user type.
+# If the verification succeeds, nothing happens. If it fails, users are redirected to default/main and restaurant owners are redirected to
+# default/restaurants. NOTE: This can also be used to check the status of users other than the one who is currently logged in.
+def VERIFY_IS_RESTAURANT(userID):
+    user = db(db.auth_user.id == userID).select().first()
+    if(user.accountType != 'Restaurant Representative'):
+        redirect(URL('default', 'main'))
+
+def VERIFY_IS_USER(userID):
+    user = db(db.auth_user.id == userID).select().first()
+    if(user.accountType != 'User'):
+        redirect(URL('default', 'restaurants'))

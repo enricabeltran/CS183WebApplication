@@ -55,8 +55,7 @@ def login():
 
 @auth.requires_login()
 def restaurants():
-    if(auth.user.accountType == 'User'):
-        redirect(URL('default', 'main'))
+    VERIFY_IS_RESTAURANT(auth.user.id)
 
     ownedRestaurants = db(db.restaurants.ownerID == auth.user.id).select() # Oh boy, I really don't remember the syntax for queries...
     ownerName = auth.user.first_name
@@ -64,9 +63,9 @@ def restaurants():
 
     return dict(ownedRestaurants=ownedRestaurants, ownerName=ownerName, addRestaurantButton=addRestaurantButton)
 
+@auth.requires_login()
 def addRest():
-    if(auth.user.accountType == 'User'):
-        redirect(URL('default', 'main'))
+    VERIFY_IS_RESTAURANT(auth.user.id)
 
     form = SQLFORM.factory(Field('restaurantName',
                                  label='Restaurant Name',
@@ -96,8 +95,7 @@ def addRest():
 
 @auth.requires_login()
 def deleteRest():
-    if(auth.user.accountType == 'User'):
-        redirect(URL('default', 'main'))
+    VERIFY_IS_RESTAURANT(auth.user.id)
 
     db(db.restaurants.id == request.args(0)).delete()
     redirect(URL('default', 'restaurants'))
@@ -105,8 +103,7 @@ def deleteRest():
 # Controller for managing a restaurant
 @auth.requires_login()
 def manage():
-    if(auth.user.accountType == 'User'):
-        redirect(URL('default', 'main'))
+    VERIFY_IS_RESTAURANT(auth.user.id)
 
     name = ''
     email = ''
@@ -125,13 +122,50 @@ def manage():
         menu = db(db.menuItems.restaurantID == request.args(0)).select()
         restID = restaurant.id
 
+        editDescForm = SQLFORM.factory(Field('description', 'text',
+                                             requires = IS_NOT_EMPTY(),
+                                             default=desc,
+                                            ),
+                                      )
+        if editDescForm.process(formname='editDescForm').accepted:
+            restaurant.update_record(description = editDescForm.vars.description)
+            redirect(URL('default', 'manage', args=[request.args(0)]))
+
+        editDescForm.elements('.w2p_fl', replace=None) # This removes the auto-generated labels from the form fields
+
+        editContactForm = SQLFORM.factory(Field('phone',
+                                                label='New Business Phone',
+                                                default = phone,
+                                                requires = IS_MATCH('^1?(-?\d{3}-?|\(\d{3}\))\d{3}-?\d{4}$',
+                                                                    error_message="Enter a phone number as '(XXX)XXX-XXXX'. Country code is optional.")
+                                               ),
+                                          Field('email',
+                                                label='New Business Email',
+                                                default = email,
+                                                requires = IS_EMAIL()
+                                               ),
+                                         )
+        if editContactForm.process(formname='editContactForm').accepted:
+            restaurant.update_record(phone=editContactForm.vars.phone, email=editContactForm.vars.email)
+            redirect(URL('default', 'manage', args=[request.args(0)]))
+
     newMenuItemButton = A('Create a New Menu Item', _class='btn', _href=URL('default', 'createMenuItem', args=[restID]))
     cancelButton = A('Return To Restaurants', _class='btn', _href=URL('default', 'restaurants'))
-    return dict(name=name, email=email, phone=phone, desc=desc, menu=menu, restID=restID, newMenuItemButton=newMenuItemButton, cancelButton=cancelButton)
+    return dict(name=name,
+                email=email,
+                phone=phone,
+                desc=desc,
+                menu=menu,
+                restID=restID,
+                newMenuItemButton=newMenuItemButton,
+                cancelButton=cancelButton,
+                editDescForm=editDescForm,
+                editContactForm=editContactForm,
+               )
 
+@auth.requires_login()
 def createMenuItem():
-    if(auth.user.accountType == 'User'):
-        redirect(URL('default', 'main'))
+    VERIFY_IS_RESTAURANT(auth.user.id)
 
     restaurantName = db(db.restaurants.id == request.args(0)).select(db.restaurants.restaurantName).first().restaurantName
 
@@ -145,9 +179,9 @@ def createMenuItem():
 
     return dict(form=form, cancelButton=cancelButton, restaurantName=restaurantName)
 
+@auth.requires_login()
 def editMenuItem():
-    if(auth.user.accountType == 'User'):
-        redirect(URL('default', 'main'))
+    VERIFY_IS_RESTAURANT(auth.user.id)
     #ADD CODE TO VERIFY THAT THE USER OWNS THIS MENU ITEM
     dish = db(db.menuItems.id == request.args(1)).select().first() #item to be edited
 
@@ -160,19 +194,18 @@ def editMenuItem():
 
     return dict(form=form, cancelButton=cancelButton, dish=dish)
 
+@auth.requires_login()
 def deleteMenuItem():
-    if(auth.user.accountType == 'User'):
-        redirect(URL('default', 'main'))
-
+    VERIFY_IS_RESTAURANT(auth.user.id)
     #ADD CODE TO VERIFY THAT THE USER OWNS THIS MENU ITEM
 
     db(db.menuItems.id == request.args(0)).delete()
 
     redirect(URL('default', 'manage', args = [request.args(1)]))
 
+@auth.requires_login()
 def tag():
-    if(auth.user.accountType == 'User'):
-        redirect(URL('default', 'main'))
+    VERIFY_IS_RESTAURANT(auth.user.id)
 
     form = SQLFORM.factory(Field('tag', requires = IS_NOT_EMPTY()),
                           )
@@ -188,8 +221,7 @@ def tag():
     return dict(form=form, cancelButton=cancelButton)
 
 def main():
-    if(auth.user.accountType == 'Restaurant Representative'):
-        redirect(URL('default', 'restaurants'))
+    VERIFY_IS_USER(auth.user.id)
 
     return dict()
 
