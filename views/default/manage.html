@@ -5,22 +5,24 @@
     {{=editDescForm}}
     {{=A("Cancel Edit", _class='btn', _id="editDescCancel")}}
 </div>
-{{if address != None:}}
+
 <p><table>
     <tr>
         <td> <i>Address: </i></p></td>
-        <td> {{=address.streetAddress}}</td>
+        <td> {{=address.streetAddress if address is not None else ''}}</td>
     </tr>
     <tr>
         <td> </td>
-        <td> {{=address.city}}, {{=address.usState}} {{=address.zipCode}}</td>
+        <td>
+            {{=address.city if address is not None else ''}}, {{=address.usState if address is not None else ''}} {{=address.zipCode if address is not None else ''}}
+        </td>
     </tr>
 </table>{{=A("Edit", _class='btn', _id="editAddressButton")}} </p>
 <div id = "editAddress">
     {{=editAddressForm}}
     {{=A("Cancel Edit", _class='btn', _id="editDescCancel")}}
 </div>
-{{pass}}
+
 <table>
     <h3>Contact Info:{{=A("Edit", _class='btn', _id="editContactButton")}}</h3>
 
