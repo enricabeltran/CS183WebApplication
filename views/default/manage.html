@@ -41,6 +41,13 @@
 
         <table>
         <tr>
+            <th>Picture</th>
+            <th>Name</th>
+            <th></th>
+            <th>Price</th>
+        </tr>
+        <tr>
+            <td><img src="{{=URL('download',args=menu[i].image)}}" style="height:100px; width:100px;"/></td>
             <td>{{=menu[i].dishName}}</td>
             <td>...</td>
             <td>{{=menu[i].price}}</td>
@@ -54,10 +61,17 @@
         <tr>
             <td>
                 <p>
-                {{for i in range(0, len(tags)):}}
-                    {{=tags[i].tag}},
+                {{for n in range(0, len(tags)):}}
+                    {{=tags[n].tag}},
                 {{pass}}
                 </p>
+            </td>
+            <td>
+                {{if taggable(menu[i].id):}}
+                <p>
+                    {{=tagForms[i]}}
+                </p>
+                {{pass}}
             </td>
         </tr>
     {{pass}}
