@@ -61,13 +61,17 @@ db.define_table('users',
 db.define_table('menuItems',
     Field('restaurantID', db.restaurants),
     Field('dishName', requires = IS_NOT_EMPTY()),
+    Field('category', writable= True),
     Field('description', 'text', requires = IS_NOT_EMPTY()),
-    Field('category', 'text'),
     Field('price', requires = IS_FLOAT_IN_RANGE(0, 1000)),
-    Field('image', 'upload'),
+    Field('image', 'upload', requires=IS_EMPTY_OR(IS_IMAGE())),
     )
 db.menuItems.restaurantID.readable = db.menuItems.restaurantID.writable = False
-
+db.menuItems.dishName.label = 'Dish Name'
+db.menuItems.category.label = 'Category (i.e. Lunch Combos, Appetizers, Desserts, ect.)'
+db.menuItems.price.label = 'Price'
+db.menuItems.image.label = 'Picture Image'
+db.menuItems.id.readable = False
 # Each element of menuTags is a short, textual tag belonging to a single menuItem. To build a list of tags, query menuTags for a given menuItem tag.
 # Dishes are limited to 5 tags. This wont be too hard, for each menuItem we just need to check how many Tags get returned for a given menuID query.
 # If 5 are found, we prevent the restaurant owner from adding more. If more than 5 are found, we can just trim off tags arbitrarily.

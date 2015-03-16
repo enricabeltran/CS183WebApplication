@@ -1,15 +1,10 @@
 {{extend 'layout.html'}}
 <h1>{{=name}}</h1>
 
-<div id="gallery">
-    {{for i in range(0, len(menu)):}}
-        <img data-src= "{{=menu[i].image}}" /> <!--how???-->
-    {{pass}}
-</div>
 
 <p>{{=desc}}</p>
 <table>
-    <h4>Contact Info:</h4>
+    <h3>Contact Info:</h3>
     <tr>
         <td>Phone Number:</td>
         <td>{{=phone}}</td>
@@ -21,26 +16,27 @@
 </table>
 
 {{if len(menu) == 0:}}
-    <h4>Uh Oh! This restaurant does not have a menu yet.</h4>
+    <h3>Uh Oh! This restaurant does not have a menu yet.</h3>
 {{else:}}
-    <h4>Menu:</h4>
-    <table>
+    {{cat = ""}}
+    <h3>Menu:</h3>
     {{for i in range(0, len(menu)):}}
+        {{if menu[i].category != cat:}}
+            {{if menu[i].category == None and cat !=None:}}
+                {{cat = None}}
+                <h4><b>No Category</b></h4>
+            {{pass}}
+            {{if menu[i].category != None:}}
+                {{cat = menu[i].category}}
+                <h4><b>{{=cat}}</b></h4>
+            {{pass}}
+        {{pass}}
+<table>
         <tr>
             <td>{{=menu[i].dishName}}</td>
             <td>...</td>
             <td>{{=menu[i].description}}</td>
             <td>{{=menu[i].price}}</td>
-        </tr>
-        {{tags = db(db.menuTags.menuID == menu[i].id).select()}}
-        <tr>
-            <td>Tags:
-                <p>
-                {{for i in range(0, len(tags)):}}
-                    {{=tags[i].tag}},
-                {{pass}}
-                </p>
-            </td>
         </tr>
     {{pass}}
     </table>

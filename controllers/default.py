@@ -135,33 +135,12 @@ def createMenuItem():
 
     restaurantName = db(db.restaurants.id == request.args(0)).select(db.restaurants.restaurantName).first().restaurantName
 
-    form = SQLFORM.factory(Field('dishName',
-                                 label='Dish Name',
-                                 requires = IS_NOT_EMPTY()
-                                ),
-                           Field('description', 'text',
-                                 label='Description',
-                                 requires = IS_NOT_EMPTY()
-                                ),
-                           Field('price',
-                                 label='Price',
-                                 requires = IS_FLOAT_IN_RANGE(0, 1000)
-                                ),
-                           Field('image', 'upload', uploadfolder=os.path.join(request.folder,'uploads/temp'),
-                                 label='Picture of Dish',
-                                 requires = IS_EMPTY_OR(IS_IMAGE()),
-                                )
-                          )
+    db.menuItems.restaurantID.default = request.args(0)
+    form = SQLFORM(db.menuItems,upload=URL('download'))
     if form.process().accepted:
-        db.menuItems.insert(restaurantID = request.args(0),
-                            dishName = form.vars.dishName,
-                            description = form.vars.description,
-                            price = form.vars.price,
-                            image = form.vars.image,
-                           )
-
+        session.flash = T("Added")
         redirect(URL('default', 'manage', args=[request.args(0)]))
-
+        
     cancelButton = A('Cancel', _class='btn', _href=URL('default', 'manage', args = [request.args(0)]))
 
     return dict(form=form, cancelButton=cancelButton, restaurantName=restaurantName)
@@ -172,35 +151,11 @@ def editMenuItem():
     #ADD CODE TO VERIFY THAT THE USER OWNS THIS MENU ITEM
     dish = db(db.menuItems.id == request.args(1)).select().first() #item to be edited
 
-    form = SQLFORM.factory(Field('dishName',
-                                 requires = IS_NOT_EMPTY(),
-                                 label = 'Dish Name',
-                                 default=dish.dishName,
-                                ),
-                           Field('description', 'text',
-                                 requires = IS_NOT_EMPTY(),
-                                 label = 'Description',
-                                 default=dish.description,
-                                ),
-                           Field('price',
-                                 requires = IS_FLOAT_IN_RANGE(0, 1000),
-                                 label = 'Price',
-                                 default= dish.price,
-                                ),
-                           Field('image', 'upload', uploadfolder=os.path.join(request.folder,'uploads/editTemp'),
-                                 label = 'Picture of Dish',
-                                 requires = IS_EMPTY_OR(IS_IMAGE()),
-                                 default= dish.image,
-                                )
-                          )
+    form = SQLFORM(db.menuItems, record = dish, upload=URL('download'))
     if form.process().accepted:
-        db(db.menuItems._id==dish.id).update(dishName = form.vars.dishName,
-                            description = form.vars.description,
-                            price = form.vars.price,
-                            image = form.vars.image,
-                           )
+        session.flash = T('Updated')
         redirect(URL('default', 'manage', args=[request.args(0)]))
-
+      
     cancelButton = A('Cancel', _class='btn', _href=URL('default', 'manage', args = [request.args(0)]))
 
     return dict(form=form, cancelButton=cancelButton, dish=dish)
@@ -260,7 +215,7 @@ def restaurantPage():
         email = restaurant.email
         phone = restaurant.phone
         desc = restaurant.description
-        menu = db(db.menuItems.restaurantID == request.args(0)).select()
+        menu = db(db.menuItems.restaurantID == request.args(0)).select(orderby=db.menuItems.category)
         restID = restaurant.id
 
     cancelButton = A('Return To Main Page', _class='btn', _href=URL('default', 'main'))
