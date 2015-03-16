@@ -222,6 +222,12 @@ def manage():
                 redirect(URL('default', 'manage', args=[request.args(0)]))
             tagForms.append(tempForm)
 
+        db.menuItems.restaurantID.default = request.args(0)
+        menuItemForm = SQLFORM(db.menuItems,upload=URL('download'))
+        if menuItemForm.process().accepted:
+            session.flash = T("Added")
+            redirect(URL('default', 'manage', args=[request.args(0)]))
+
     newMenuItemButton = A('Create a New Menu Item', _class='btn', _href=URL('default', 'createMenuItem', args=[restID]))
     cancelButton = A('Return To Restaurants', _class='btn', _href=URL('default', 'restaurants'))
     return dict(name=name,
@@ -237,6 +243,7 @@ def manage():
                 address=address,
                 editAddressForm=editAddressForm,
                 tagForms=tagForms,
+                menuItemForm=menuItemForm,
                )
 
 @auth.requires_login()

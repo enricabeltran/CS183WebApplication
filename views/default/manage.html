@@ -58,7 +58,7 @@
             {{pass}}
         {{pass}}
 
-        <table>
+    <table>
         <tr>
             <th>Picture</th>
             <th>Name</th>
@@ -73,35 +73,30 @@
             </td>
             <td>{{=menu[i].dishName}}</td>
             <td>...</td>
-            <td>{{='$' + "%0.2f" % float(menu[i].price)}}</td> <!-- This looks weird, but it makes price display as two decimal points -->
+            <td>{{='$' + "%0.2f" % float(menu[i].price)}}</td> <!-- This looks weird, but it makes price display with two decimal points -->
             <td>{{=A('Edit', _class='btn', _href=URL('default', 'editMenuItem', args=[restID, menu[i].id]))}}</td>
             <td>{{=A('Delete', _class='btn', _href=URL('default', 'deleteMenuItem', args=[menu[i].id, restID]))}}</td>
-            {{if taggable(menu[i].id):}}
-                <td>{{=A('Add Tag', _class='btn', _href=URL('default', 'tag', args=[menu[i].id, restID]))}}</td>
-            {{pass}}
         </tr>
-        {{tags = db(db.menuTags.menuID == menu[i].id).select()}}
-        <tr>
-            <td>
-                <p>
-                {{for n in range(0, len(tags)):}}
-                    {{=tags[n].tag}},
-                {{pass}}
-                </p>
-            </td>
-            <td>
-                {{if taggable(menu[i].id):}}
-                <p>
-                    {{=tagForms[i]}}
-                </p>
-                {{pass}}
-            </td>
-        </tr>
-    {{pass}}
     </table>
+    {{tags = db(db.menuTags.menuID == menu[i].id).select()}}
+    <p>
+    {{for n in range(0, len(tags)):}}
+        {{=tags[n].tag}}{{=',' if n != len(tags)-1 else ''}}
+    {{pass}}
+    </p>
+    {{if taggable(menu[i].id):}}
+    <p>
+    {{=tagForms[i]}}
+    </p>
+    {{pass}}
+    {{pass}}
 {{pass}}
 
-{{=newMenuItemButton}}
+{{=A("Create New Menu Item", _class='btn', _id="menuItemButton")}}
+<div id="menuItemForm">
+    {{=menuItemForm}}
+    {{=A("Cancel", _class='btn', _id="menuItemCancel")}}
+</div>
 <br>
 {{=cancelButton}}
 
@@ -128,5 +123,15 @@
     });
     jQuery("#editAddressCancel").click(function(){
         $("#editAddress").fadeOut();
+    });
+
+    jQuery("#menuItemForm").hide();
+    jQuery("#menuItemButton").click(function(){
+        $("#menuItemForm").fadeIn();
+        $("#menuItemButton").fadeOut();
+    });
+    jQuery("#menuItemCancel").click(function(){
+        $("#menuItemForm").fadeOut();
+        $("#menuItemButton").fadeIn();
     });
 </script>
