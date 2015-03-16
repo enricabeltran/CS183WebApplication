@@ -66,6 +66,8 @@ def restaurants():
 @auth.requires_login()
 def addRest():
     VERIFY_IS_RESTAURANT(auth.user.id)
+    
+    STATES = ['Alabama', 'Alaska','Arizona', 'Arkansas', 'California','Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine','Maryland','Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota','Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington','West Virginia', 'Wisconsin', 'Wyoming']
 
     form = SQLFORM.factory(Field('restaurantName',
                                  label='Restaurant Name',
@@ -78,6 +80,22 @@ def addRest():
                                  label='Business Email',
                                  requires = IS_EMAIL()
                                  ),
+                           Field('streetAddress',
+                                 label = 'Address',
+                                 requires = IS_NOT_EMPTY(),
+                                 ),
+                           Field('city',
+                                 label = 'City',
+                                 requires = IS_NOT_EMPTY(),
+                                 ),
+                           Field('zipCode',
+                                 label = 'Zip Code',
+                                 requires = IS_NOT_EMPTY(),
+                                ),
+                           Field('usState',
+                                 label = 'U.S. State',
+                                 requires = IS_IN_SET(STATES),
+                                 ),
                            Field('description', 'text',
                                  label='Restaurant Description',
                                  ),
@@ -88,6 +106,12 @@ def addRest():
                                phone = form.vars.phone,
                                email = form.vars.email,
                                description = form.vars.description,
+                               addressID =  db.addresses.insert(userID = auth.user.id,
+                                                   streetAddress = form.vars.streetAddress,
+                                                   city = form.vars.city,
+                                                   zipCode = form.vars.zipCode,
+                                                   usState = form.vars.usState,
+                                                   )
                               )
         redirect(URL('default', 'restaurants'))
 
@@ -114,6 +138,7 @@ def manage():
     tags = []
 
     restaurant = db(db.restaurants.id == request.args(0)).select().first()
+    address = db(db.addresses.id == restaurant.addressID).select().first()
     if restaurant is not None:
         name = restaurant.restaurantName
         email = restaurant.email
@@ -132,7 +157,32 @@ def manage():
             redirect(URL('default', 'manage', args=[request.args(0)]))
 
         editDescForm.elements('.w2p_fl', replace=None) # This removes the auto-generated labels from the form fields
+        editAddressForm = SQLFORM.factory(Field('streetAddress',
+                                 label = 'Address',
+                                 requires = IS_NOT_EMPTY(),
+                                 ),
+                           Field('city',
+                                 label = 'City',
+                                 requires = IS_NOT_EMPTY(),
+                                 ),
+                           Field('zipCode',
+                                 label = 'Zip Code',
+                                 requires = IS_NOT_EMPTY(),
+                                ),
+                           Field('usState',
+                                 label = 'U.S. State',
+                                 requires = IS_IN_SET(STATES),
+                                 ),
+                       )
+        if editAddressForm.process(formname='editAddressForm').accepted:
+            address.update_record(streetAddress = editAddressForm.vars.streetAddress,
+                                 city = editAddressForm.vars.city,
+                                 zipCode = editAddressForm.vars.zipCode,
+                                 usState = editAddressForm.vars.usState)
+            redirect(URL('default', 'manage', args=[request.args(0)]))
 
+        #editDescForm.elements('.w2p_fl', replace=None) # This removes the auto-generated labels from the form fields
+        
         editContactForm = SQLFORM.factory(Field('phone',
                                                 label='New Business Phone',
                                                 default = phone,
@@ -161,6 +211,8 @@ def manage():
                 cancelButton=cancelButton,
                 editDescForm=editDescForm,
                 editContactForm=editContactForm,
+                address=address,
+                editAddressForm=editAddressForm
                )
 
 @auth.requires_login()

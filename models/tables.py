@@ -16,6 +16,7 @@ db.define_table('addresses',
     Field('zipCode'),
     Field('usState'),
     Field('userID', db.auth_user),
+    Field('restaurantID'),
     )
 db.addresses.usState.requires = IS_IN_SET(STATES)
 

@@ -1,19 +1,35 @@
 {{extend 'layout.html'}}
 <h1>Managing {{=name}}...</h1>
-<p>{{=desc}}{{=A("Edit", _class='btn', _id="editDescButton")}}</p>
+<p><i>Description:</i> {{=desc}}{{=A("Edit", _class='btn', _id="editDescButton")}}</p>
 <div id ="editDesc">
     {{=editDescForm}}
     {{=A("Cancel Edit", _class='btn', _id="editDescCancel")}}
 </div>
+{{if address != None:}}
+<p><table>
+    <tr>
+        <td> <i>Address: </i></p></td>
+        <td> {{=address.streetAddress}}</td>
+    </tr>
+    <tr>
+        <td> </td>
+        <td> {{=address.city}}, {{=address.usState}} {{=address.zipCode}}</td>
+    </tr>
+</table>{{=A("Edit", _class='btn', _id="editAddressButton")}} </p>
+<div id = "editAddress">
+    {{=editAddressForm}}
+    {{=A("Cancel Edit", _class='btn', _id="editDescCancel")}}
+</div>
+{{pass}}
 <table>
     <h3>Contact Info:{{=A("Edit", _class='btn', _id="editContactButton")}}</h3>
 
     <tr>
-        <td>Phone Number:</td>
+        <td><i>Phone Number: </i></td>
         <td>{{=phone}}</td>
     </tr>
     <tr>
-        <td>Email:</td>
+        <td><i>Email:</i></td>
         <td>{{=email}}</td>
     </tr>
 </table>
@@ -70,6 +86,7 @@
 
 <script>
     jQuery("#editDesc").hide();
+    jQuery("#editAddress").hide();
     jQuery("#editDescCancel").click(function(){
         $("#editDesc").fadeOut();
     });
@@ -83,5 +100,8 @@
     });
     jQuery("#editContactButton").click(function(){
         $("#editContact").fadeIn();
+    });
+    jQuery("editAddressButton").click(function(){
+        $("#editAddress").fadeIn();
     });
 </script>
