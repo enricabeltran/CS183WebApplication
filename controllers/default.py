@@ -1,14 +1,7 @@
 import os
+from pygeocoder import Geocoder
+import pygeolib
 # -*- coding: utf-8 -*-
-# this file is released under public domain and you can use without limitations
-
-#########################################################################
-## This is a sample controller
-## - index is the default action of any application
-## - user is required for authentication and authorization
-## - download is for downloading files uploaded in the db (does streaming)
-## - api is an example of Hypermedia API support and access control
-#########################################################################
 
 def index():
     startAsRestaurant = ''
@@ -107,18 +100,25 @@ def addRest():
                                  ),
                           )
     if form.process().accepted:
+        try:
+            geoQuery = Geocoder.geocode(form.vars.streetAddress + ', ' + form.vars.city + ', ' + form.vars.usState + ', ' + form.vars.zipCode)
+            coords = geoQuery[0].coordinates
+        except pygeolib.GeocoderError:
+            coords = (None, None)
         db.restaurants.insert(ownerID = auth.user.id,
-                               cuisineType = form.vars.cuisineType,
-                               restaurantName = form.vars.restaurantName,
-                               phone = form.vars.phone,
-                               email = form.vars.email,
-                               description = form.vars.description,
-                               addressID =  db.addresses.insert(userID = auth.user.id,
-                                                   streetAddress = form.vars.streetAddress,
-                                                   city = form.vars.city,
-                                                   zipCode = form.vars.zipCode,
-                                                   usState = form.vars.usState,
-                                                   )
+                              cuisineType = form.vars.cuisineType,
+                              restaurantName = form.vars.restaurantName,
+                              phone = form.vars.phone,
+                              email = form.vars.email,
+                              description = form.vars.description,
+                              coordX = coords[0],
+                              coordY = coords[1],
+                              addressID =  db.addresses.insert(userID = auth.user.id,
+                                                               streetAddress = form.vars.streetAddress,
+                                                               city = form.vars.city,
+                                                               zipCode = form.vars.zipCode,
+                                                               usState = form.vars.usState,
+                                                              )
                               )
         redirect(URL('default', 'restaurants'))
 
@@ -160,6 +160,8 @@ def manage():
         email = restaurant.email
         phone = restaurant.phone
         desc = restaurant.description
+        coordX = restaurant.coordX
+        coordY = restaurant.coordY
         menu = db(db.menuItems.restaurantID == request.args(0)).select()
         hours = db(db.hours.restaurantID == request.args(0)).select()
         restID = restaurant.id
@@ -208,11 +210,20 @@ def manage():
                                  ),
                        )
         if editAddressForm.process(formname='editAddressForm').accepted:
+            addString = editAddressForm.vars.streetAddress + ', ' + editAddressForm.vars.city + ', ' + editAddressForm.vars.usState + ', ' + editAddressForm.vars.zipCode
+            try:
+                geoQuery = Geocoder.geocode(addString)
+                coords = geoQuery[0].coordinates
+            except pygeolib.GeocoderError:
+                coords = (None, None)
+
+            session.flash = coords
             if address is not None:
                 address.update_record(streetAddress = editAddressForm.vars.streetAddress,
-                                     city = editAddressForm.vars.city,
-                                     zipCode = editAddressForm.vars.zipCode,
-                                     usState = editAddressForm.vars.usState)
+                                      city = editAddressForm.vars.city,
+                                      zipCode = editAddressForm.vars.zipCode,
+                                      usState = editAddressForm.vars.usState,
+                                     )
             else:
                 db.addresses.insert(streetAddress = editAddressForm.vars.streetAddress,
                                     city = editAddressForm.vars.city,
@@ -221,6 +232,9 @@ def manage():
                                     userID = auth.user.id,
                                     restaurantID = request.args(0),
                                    )
+            restaurant.update_record(coordX = coords[0],
+                                     coordY = coords[1],
+                                    )
             redirect(URL('default', 'manage', args=[request.args(0)]))
 
 
@@ -315,6 +329,8 @@ def manage():
                 editDescForm=editDescForm,
                 editContactForm=editContactForm,
                 address=address,
+                coordX=coordX,
+                coordY=coordY,
                 editAddressForm=editAddressForm,
                 tagForms=tagForms,
                 menuItemForm=menuItemForm,
