@@ -147,7 +147,7 @@ def manage():
     desc = ''
     menu = ''
     cuisine = ''
-    hours = ''
+    hours = []
     restID = -1
     tags = [] # I'm not sure this is even used... -Sam
     tagForms = []
@@ -187,7 +187,7 @@ def manage():
         if editCuisineForm.process(formname='editCuisineForm').accepted:
             restaurant.update_record(cuisineType = editCuisineForm.vars.cuisineType)
             redirect(URL('default', 'manage', args=[request.args(0)]))
-        
+
         editAddressForm = SQLFORM.factory(Field('streetAddress',
                                  label = 'Address',
                                  default = address.streetAddress,
@@ -262,13 +262,60 @@ def manage():
                                        )
 
         def earlier(openHour,openMinute, closeHour, closeMinute):
-            if openHour == closeHour:
-                return openMinute<closeMinute
+            if int(openHour) == int(closeHour):
+                return int(openMinute)<int(closeMinute)
             else:
-                return openHour<closeHour
+                return int(openHour)<int(closeHour)
+
+        def getMin(hoursList):
+            minIndex = 0
+            for i in range(0, len(hoursList)):
+                if earlier(hoursList[minIndex].openAtHour, hoursList[minIndex].openAtMinute, hoursList[i].openAtHour, hoursList[i].openAtMinute):
+                    minIndex = i
+            return minIndex
+
+        def sortHours(hoursList):
+            sortedHours = hoursList
+            for i in range(0, len(sortedHours)):
+                minIndex = getMin(sortedHours)
+                tempHours = sortedHours[i]
+                sortedHours[i] = sortedHours[minIndex]
+                sortedHours[minIndex] = tempHours
+            return sortedHours
+
+        sun = []
+        mon = []
+        tue = []
+        wed = []
+        thu = []
+        fri = []
+        sat = []
+        for x in range(0, len(hours)):
+            if hours[x].dayOfWeek == "Sunday":
+                sun.append(hours[x])
+            elif hours[x].dayOfWeek == "Monday":
+                mon.append(hours[x])
+            elif hours[x].dayOfWeek == "Tuesday":
+                tue.append(hours[x])
+            elif hours[x].dayOfWeek == "Wednesday":
+                wed.append(hours[x])
+            elif hours[x].dayOfWeek == "Thursday":
+                thu.append(hours[x])
+            elif hours[x].dayOfWeek == "Friday":
+                fri.append(hours[x])
+            else:
+                sat.append(hours[x])
+            pass
+        pass
+        sun = sortHours(sun)
+        mon = sortHours(mon)
+        tue = sortHours(tue)
+        wed = sortHours(wed)
+        thu = sortHours(thu)
+        fri = sortHours(fri)
+        sat = sortHours(sat)
 
         if addHoursForm.process(formname='addHoursForm').accepted:
-             
             if earlier(int(addHoursForm.vars.openAtHour), int(addHoursForm.vars.openAtMinute), int(addHoursForm.vars.closedAtHour), addHoursForm.vars.closesAtMinute):
                 db.hours.insert(restaurantID = request.args(0),
                                     dayOfWeek = addHoursForm.vars.dayOfWeek,
@@ -281,9 +328,7 @@ def manage():
             else:
                 session.flash="Invalid time range. Please make sure your opening time is earlier than your closing time."
                 redirect(URL('default', 'manage', args=[request.args(0)]))
-           
 
-            
         editContactForm = SQLFORM.factory(Field('phone',
                                                 label='New Business Phone',
                                                 default = phone,
@@ -338,6 +383,13 @@ def manage():
                 hours=hours,
                 editCuisineForm=editCuisineForm,
                 cuisine=cuisine,
+                sun=sun,
+                mon=mon,
+                tue=tue,
+                wed=wed,
+                thu=thu,
+                fri=fri,
+                sat=sat,
                )
 
 @auth.requires_login()
@@ -396,6 +448,22 @@ def tag():
     cancelButton = A('Cancel', _class='btn', _href=URL('default', 'manage', args = [request.args(1)]))
 
     return dict(form=form, cancelButton=cancelButton)
+
+@auth.requires_login()
+def removetag():
+    VERIFY_IS_RESTAURANT(auth.user.id)
+
+    db(db.menuTags.id == request.args(0)).delete()
+
+    redirect(URL('default', 'manage', args = [request.args(1)]))
+
+@auth.requires_login()
+def removehours():
+    VERIFY_IS_RESTAURANT(auth.user.id)
+
+    db(db.hours.id == request.args(0)).delete()
+
+    redirect(URL('default', 'manage', args = [request.args(1)]))
 
 def main():
     VERIFY_IS_USER(auth.user.id)
