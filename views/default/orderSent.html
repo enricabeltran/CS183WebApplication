@@ -1,0 +1,18 @@
+{{extend 'layout.html'}}
+<h1>Your Order#{{=request.args(0)}} has been sent to {{=restaurant.restaurantName}}!</h1>
+
+<h2>If you would like to make any changes to your order please contact {{=restaurant.restaurantName}} directly.</h2>
+
+<table>
+    <h3>Contact Info:</h3>
+    <tr>
+        <td>Phone Number:</td>
+        <td>{{=restaurant.phone}}</td>
+    </tr>
+    <tr>
+        <td>Email:</td>
+        <td>{{=restaurant.email}}</td>
+    </tr>
+</table>
+
+<h4>{{=A('Back to Main', _href=URL('default', 'main'))}}</h4>

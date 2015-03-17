@@ -26,18 +26,33 @@
         <td>${{=menu[i].price}}</td>
         <td>.....</td>
         <td><i>{{=menu[i].description}}</i></td>
-        <td>Add To Order</td>
+        <td>{{=A('Add to Order', _href=URL('default', 'addToOrder', args=[ request.args(0),request.args(1),menu[i].id]))}}</td>
     </tr>
+    {{pass}}
 </table>
-{{pass}}
-
+    
 <h3>Your Order:</h3>
 <table>
     <tr>
         <th>Item</th>
-        <th>Quantity</th>
-        <th>Subtotal</th>
+        <th>     </th>
+        <th>Price</th>
+        <th>     </th>
+        <th>Delete?</th>
     </tr>
+    <tr>
+    {{for i in range(0,len(cart)):}}
+        {{dish = db(db.menuItems.id == cart[i].menuID).select().first()}}
+        <td>{{=dish.dishName}}</td>
+        <td></td>
+        <td>${{=dish.price}}</td>
+        <td></td>
+        <td>{{=A('Delete', _href=URL('default', 'deleteFromOrder', args=[ request.args(0),request.args(1),cart[i].id]))}}</td>
+    </tr>
+    {{pass}}
 </table>
+<p><b>SubTotal(before tax):</b> ${{=subtotal}} </p>
+
+<h3>{{=A('Confirm Order', _href=URL('default', 'confirmOrder', args=[request.args(1),request.args(0)]))}}</h3>
 
 {{=backButton}}

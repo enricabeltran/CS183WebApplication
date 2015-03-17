@@ -1,0 +1,25 @@
+{{extend 'layout.html'}}
+<h1>Confirming Order #{{=request.args(0)}} for {{=restaurant.restaurantName}}</h1>
+<h3>Your Order:</h3>
+<table>
+    <tr>
+        <th>Item</th>
+        <th>     </th>
+        <th>Price</th>
+    </tr>
+    <tr>
+    {{for i in range(0,len(cart)):}}
+        {{dish = db(db.menuItems.id == cart[i].menuID).select().first()}}
+        <td>{{=dish.dishName}}</td>
+        <td></td>
+        <td>${{=dish.price}}</td>
+    </tr>
+    {{pass}}
+</table>
+<p><b>SubTotal(before tax):</b> ${{=subtotal}} </p>
+
+<h3>Enter Your Contact and Deliever Information:</h3>
+{{=contactForm}}
+
+
+<h3>{{=A('Edit Order', _href=URL('default', 'order', args=[request.args(1),request.args(0)]))}}</h3>

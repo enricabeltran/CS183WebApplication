@@ -15,10 +15,10 @@
 
     <table>
         <h3>Address:{{=A("Edit", _class='btn', _id="editAddressButton")}}</h3>
-        {{if coordX is None or coordY is None:}}
+        {{#if coordX is None or coordY is None:}} <!--
         <h4 style='color:red'>We couldn't confirm your address!</h4>
         <b style='color:red'>You can fix this by updating your address listing. Until you do, this restaurant will not appear on our service!</b>
-        {{pass}}
+        {{#pass}} -->
         <tr>
             <td>{{=address.streetAddress if address is not None else ''}}</td>
         </tr>

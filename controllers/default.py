@@ -1,6 +1,5 @@
 import os
-from pygeocoder import Geocoder
-import pygeolib
+from gluon.tools import Mail
 # -*- coding: utf-8 -*-
 
 def index():
@@ -230,7 +229,7 @@ def manage():
                                     zipCode = editAddressForm.vars.zipCode,
                                     usState = editAddressForm.vars.usState,
                                     userID = auth.user.id,
-                                    restaurantID = request.args(0),
+                                    #restaurantID = request.args(0),
                                    )
             restaurant.update_record(coordX = coords[0],
                                      coordY = coords[1],
@@ -474,8 +473,6 @@ def main():
 #This page will navigate to an ordering page
 def restaurantPage():
     #args(0) is the restaurant_id
-    #args(1) is optional--menu_id from which the user navigated from
-
     restaurant = db(db.restaurants.id == request.args(0)).select().first()
 
 
@@ -502,16 +499,139 @@ def restaurantPage():
     return dict(cuisine=cuisine, name=name, email=email, phone=phone, desc=desc, menu=menu, restID=restID, cancelButton=cancelButton)
 
 def order():
-    name = "Error: Restaurant Not Specified"
+    name = "Error: Restaurant Not Specified" 
     menu = []
-    backButton = A("Back", _class='btn', _href=URL('default', 'main')) # This should check if the user came from the restaurantPage (somehow), and take then back accordingly
-
+    cart = []
+    subtotal = 0.0
+    backButton = A("Back", _class='btn', _href=URL('default', 'restaurantPage')) # This should check if the user came from the restaurantPage (somehow), and take then back accordingly--think the way we are set up right now, people will only be order by navigating through the restaurantPage
+    #args(0) restaurantID
+    #args(1) orderID
+    
     if request.args(0) is not None:
         restaurant = db(db.restaurants.id == request.args(0)).select().first()
         name = restaurant.restaurantName
         menu = db(db.menuItems.restaurantID == restaurant.id).select()
-    return dict(name=name, menu=menu, backButton=backButton)
+        cart = db(db.orderItem.orderID == request.args(1)).select()
+        for i in range(0,len(cart)):
+            dish = db(db.menuItems.id == cart[i].menuID).select().first()
+            subtotal += float(dish.price)
+            
+    return dict(name=name, menu=menu, cart=cart, backButton=backButton, subtotal=subtotal)
 
+def addToOrder():
+    #args(0) is restaurant
+    #args(1) order number
+    #args(2) menuItem
+    db.orderItem.insert(orderID=request.args(1), menuID=request.args(2))
+    redirect(URL('default', 'order', args = [request.args(0),request.args(1)]))
+    
+    return dict()
+
+def deleteFromOrder():
+    #args(0) is restaurant
+    #args(1) order number
+    #args(2) is orderItemID
+    db(db.orderItem.id == request.args(2)).delete()
+    redirect(URL('default', 'order', args = [request.args(0),request.args(1)]))
+    
+    return dict()
+
+def confirmOrder():
+    #args(0) orderID
+    #args(1) restuarantID
+    mail = Mail()
+    mail.settings.server = 'smtp.gmail.com:587'
+    mail.settings.sender = 'feedrinc@gmail.com'
+    mail.settings.login = 'feedrinc:cs183webapps'
+    restaurant = db(db.restaurants.id == request.args(1)).select().first()
+    order = db(db.orders.id == request.args(0)).select().first()
+    cart = []
+    customer = ''
+    customerName =auth.user.first_name +' '+auth.user.last_name
+    subtotal = 0.0
+    if order is not None:
+        cart = db(db.orderItem.orderID == request.args(0)).select()
+        for i in range(0,len(cart)):
+            dish = db(db.menuItems.id == cart[i].menuID).select().first()
+            subtotal += float(dish.price)
+    contactForm = editAddressForm = SQLFORM.factory(Field('phone',
+                                                          label = 'Phone',
+                                                          requires = IS_NOT_EMPTY()),
+                           Field('email',
+                                 label = 'Email',
+                                 default = auth.user.email,
+                                 requires = IS_NOT_EMPTY()
+                                 ),
+                           Field('streetAddress',
+                                 label = 'Address',
+                                 requires = IS_NOT_EMPTY(),
+                                 ),
+                           Field('city',
+                                 label = 'City',
+                                 requires = IS_NOT_EMPTY(),
+                                 ),
+                           Field('zipCode',
+                                 label = 'Zip Code',
+                                 requires = IS_NOT_EMPTY(),
+                                ),
+                           Field('usState',
+                                 label = 'U.S. State',
+                                 requires = IS_IN_SET(STATES),
+                                 ),
+                           Field('confirm', 'boolean',
+                                 label = 'Confirm?',
+                                 default = False,
+                                 ),
+                       )
+    if contactForm.process(formname='contactForm').accepted:
+        if(contactForm.vars.confirm!=True):
+            session.flash = 'Please click on confirm checkbox'
+            redirect(URL('default', 'confirmOrder', args=[request.args(0),request.args(1)]))
+        else:
+            order.update(addressID =
+                db.addresses.insert(streetAddress = contactForm.vars.streetAddress,
+                                    city =  contactForm.vars.city,
+                                    zipCode = contactForm.vars.zipCode,
+                                    usState = contactForm.vars.usState,
+                                    userID = auth.user.id,
+                                   )
+                        )
+            m = 'Contents of Order #'+request.args(0)+'\n'
+            for i in range(0, len(cart)):
+                dish = db(db.menuItems.id == cart[i].menuID).select().first()
+                m = m + dish.dishName +'\t $'+dish.price+'\n'
+            m = m +'\n Subtotal: $'+str(subtotal) + '\n'
+            m = m +'Customer Order Information: \n'+ customerName +'\n' + contactForm.vars.email +'\n' + contactForm.vars.phone +'\n' +contactForm.vars.streetAddress+'\n'+contactForm.vars.city+'n'+conactForm.vars.zipCode+'\n'+contactForm.vars.usState
+            
+            mail.send(to=[restaurant.email],
+                        subject='New: Order#'+request.args(0),
+                        # If reply_to is omitted, then mail.settings.sender is used
+                        message=m )
+            mail.send(to=[contactForm.vars.email],
+                        subject='Order#'+request.args(0)+' Sent!',
+                        # If reply_to is omitted, then mail.settings.sender is used
+                        message= 'This is what we sent to the restaurant!:\n' + m )
+            redirect(URL('default', 'orderSent', args=[request.args(0),request.args(1)]))
+
+    
+            
+        
+    return dict(cart=cart, subtotal=subtotal, restaurant=restaurant, contactForm=contactForm)
+
+def orderSent():
+    #args(0) orderID
+    #args(1) restuarantID
+    restaurant = db(db.restaurants.id == request.args(1)).select().first()
+    order = db(db.orders.id ==request.args(0)).select().first()
+    cart = db(db.orderItem.orderID == request.args(0)).select()
+    return dict(restaurant=restaurant, order=order, cart=cart)
+
+def startOrder():
+        #args(0) ->restuarantID
+        orderNum = db.orders.insert(userID= auth.user.id,
+                                    restaurantID = request.args(0))
+        redirect(URL('default', 'order', args=[request.args(0),orderNum]))
+        return dict()
 
 def user():
     """
