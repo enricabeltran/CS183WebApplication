@@ -15,6 +15,100 @@
         <td>{{=email}}</td>
     </tr>
 </table>
+<table>
+    <h3>Hours:</h3>
+    <tr>
+        <td>Sunday: </td>
+        <td>{{if len(sun) == 0:}}
+                Closed
+            {{else:}}
+                {{for i in range(0, len(sun)):}}
+                {{row = sun[i]}}
+                {{=row.openAtHour}}:{{=row.openAtMinute}}-{{=row.closedAtHour}}:{{=row.closedAtMinute}}
+                <br>
+                {{pass}}
+            {{pass}}
+        </td>
+    </tr>
+    <tr>
+        <td>Monday: </td>
+        <td>{{if len(mon) == 0:}}
+                Closed
+            {{else:}}
+                {{for i in range(0, len(mon)):}}
+                {{row = mon[i]}}
+                {{=row.openAtHour}}:{{=row.openAtMinute}}-{{=row.closedAtHour}}:{{=row.closedAtMinute}}
+                <br>
+                {{pass}}
+            {{pass}}
+        </td>
+    </tr>
+    <tr>
+        <td>Tuesday: </td>
+        <td>{{if len(tue) == 0:}}
+                Closed
+            {{else:}}
+                {{for i in range(0, len(tue)):}}
+                {{row = tue[i]}}
+                {{=row.openAtHour}}:{{=row.openAtMinute}}-{{=row.closedAtHour}}:{{=row.closedAtMinute}}
+                <br>
+                {{pass}}
+            {{pass}}
+        </td>
+    </tr>
+    <tr>
+        <td>Wednesday: </td>
+        <td>{{if len(wed) == 0:}}
+                Closed
+            {{else:}}
+                {{for i in range(0, len(wed)):}}
+                {{row = wed[i]}}
+                {{=row.openAtHour}}:{{=row.openAtMinute}}-{{=row.closedAtHour}}:{{=row.closedAtMinute}}
+                <br>
+                {{pass}}
+            {{pass}}
+        </td>
+    </tr>
+    <tr>
+        <td>Thursday: </td>
+        <td>{{if len(thu) == 0:}}
+                Closed
+            {{else:}}
+                {{for i in range(0, len(thu)):}}
+                {{row = thu[i]}}
+                {{=row.openAtHour}}:{{=row.openAtMinute}}-{{=row.closedAtHour}}:{{=row.closedAtMinute}}
+                <br>
+                {{pass}}
+            {{pass}}
+        </td>
+    </tr>
+    <tr>
+        <td>Friday: </td>
+        <td>{{if len(fri) == 0:}}
+                Closed
+            {{else:}}
+                {{for i in range(0, len(fri)):}}
+                {{row = fri[i]}}
+                {{=row.openAtHour}}:{{=row.openAtMinute}}-{{=row.closedAtHour}}:{{=row.closedAtMinute}}
+                <br>
+                {{pass}}
+            {{pass}}
+        </td>
+    </tr>
+    <tr>
+        <td>Saturday: </td>
+        <td>{{if len(sat) == 0:}}
+                Closed
+            {{else:}}
+                {{for i in range(0, len(sat)):}}
+                {{row = sat[i]}}
+                {{=row.openAtHour}}:{{=row.openAtMinute}}-{{=row.closedAtHour}}:{{=row.closedAtMinute}}
+                <br>
+                {{pass}}
+            {{pass}}
+        </td>
+    </tr>
+</table>
 
 {{if len(menu) == 0:}}
     <h3>Uh Oh! This restaurant does not have a menu yet.</h3>
@@ -38,10 +132,7 @@
             <td>.....</td>
             <td><b>     ${{=menu[i].price}}</b></td>
             <td>.....</td>
-            <td>    <i>Description: </i>{{=menu[i].description}}</td>
-
-            
-            
+            <td><i>Description: </i>{{=menu[i].description}}</td>
         </tr>
     {{pass}}
     </table>
