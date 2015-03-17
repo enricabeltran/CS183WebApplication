@@ -475,7 +475,6 @@ def restaurantPage():
     #args(0) is the restaurant_id
     restaurant = db(db.restaurants.id == request.args(0)).select().first()
 
-
     name = ''
     email = ''
     phone = ''
@@ -484,6 +483,14 @@ def restaurantPage():
     cuisine = ''
     restID = -1
     tags = []
+    hours = []
+    sun = []
+    mon = []
+    tue = []
+    wed = []
+    thu = []
+    fri = []
+    sat = []
 
     if restaurant is not None:
         name = restaurant.restaurantName
@@ -494,9 +501,73 @@ def restaurantPage():
         restID = restaurant.id
         cuisine = restaurant.cuisineType
 
+        hours = db(db.hours.restaurantID == request.args(0)).select()
+
+        def earlier(openHour,openMinute, closeHour, closeMinute):
+            if int(openHour) == int(closeHour):
+                return int(openMinute)<int(closeMinute)
+            else:
+                return int(openHour)<int(closeHour)
+
+        def getMin(hoursList):
+            minIndex = 0
+            for i in range(0, len(hoursList)):
+                if earlier(hoursList[minIndex].openAtHour, hoursList[minIndex].openAtMinute, hoursList[i].openAtHour, hoursList[i].openAtMinute):
+                    minIndex = i
+            return minIndex
+
+        def sortHours(hoursList):
+            sortedHours = hoursList
+            for i in range(0, len(sortedHours)):
+                minIndex = getMin(sortedHours)
+                tempHours = sortedHours[i]
+                sortedHours[i] = sortedHours[minIndex]
+                sortedHours[minIndex] = tempHours
+            return sortedHours
+
+        for x in range(0, len(hours)):
+            if hours[x].dayOfWeek == "Sunday":
+                sun.append(hours[x])
+            elif hours[x].dayOfWeek == "Monday":
+                mon.append(hours[x])
+            elif hours[x].dayOfWeek == "Tuesday":
+                tue.append(hours[x])
+            elif hours[x].dayOfWeek == "Wednesday":
+                wed.append(hours[x])
+            elif hours[x].dayOfWeek == "Thursday":
+                thu.append(hours[x])
+            elif hours[x].dayOfWeek == "Friday":
+                fri.append(hours[x])
+            else:
+                sat.append(hours[x])
+            pass
+        pass
+        sun = sortHours(sun)
+        mon = sortHours(mon)
+        tue = sortHours(tue)
+        wed = sortHours(wed)
+        thu = sortHours(thu)
+        fri = sortHours(fri)
+        sat = sortHours(sat)
+
     cancelButton = A('Return To Main Page', _class='btn', _href=URL('default', 'main'))
 
-    return dict(cuisine=cuisine, name=name, email=email, phone=phone, desc=desc, menu=menu, restID=restID, cancelButton=cancelButton)
+    return dict(cuisine=cuisine,
+                name=name,
+                email=email,
+                phone=phone,
+                desc=desc,
+                menu=menu,
+                restID=restID,
+                cancelButton=cancelButton,
+                sun=sun,
+                mon=mon,
+                tue=tue,
+                wed=wed,
+                thu=thu,
+                fri=fri,
+                sat=sat,
+               )
 
 def order():
     name = "Error: Restaurant Not Specified" 
@@ -526,6 +597,7 @@ def addToOrder():
     redirect(URL('default', 'order', args = [request.args(0),request.args(1)]))
     
     return dict()
+
 
 def deleteFromOrder():
     #args(0) is restaurant
@@ -632,6 +704,12 @@ def startOrder():
                                     restaurantID = request.args(0))
         redirect(URL('default', 'order', args=[request.args(0),orderNum]))
         return dict()
+
+def about():
+	return dict()
+	
+def contact():
+	return dict()
 
 def user():
     """
