@@ -512,6 +512,11 @@ def order():
         menu = db(db.menuItems.restaurantID == restaurant.id).select()
     return dict(name=name, menu=menu, backButton=backButton)
 
+def about():
+	return dict()
+	
+def contact():
+	return dict()
 
 def user():
     """
