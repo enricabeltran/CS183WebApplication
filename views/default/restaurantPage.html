@@ -1,4 +1,9 @@
 {{extend 'layout.html'}}
+{{photo = []}}
+{{for x in range(0, len(menu)):}}
+    {{photo.append(menu[x].image)}}
+{{pass}}
+
 <h1>{{=name}}</h1>
 <h4><i>{{=cuisine}}</i></h4>
 
