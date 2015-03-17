@@ -26,6 +26,8 @@ db.define_table('restaurants',
     Field('email', required=False),
     Field('phone', required=True),
     Field('addressID', db.addresses),
+    Field('coordX'),
+    Field('coordY'),
     Field('cuisineType'),
     Field('description', 'text'),
     Field('priceRange'),              # We should pull this from outside source--not from user
