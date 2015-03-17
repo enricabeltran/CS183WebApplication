@@ -15,11 +15,11 @@ STATES = ['Alabama', 'Alaska','Arizona', 'Arkansas', 'California','Colorado', 'C
 #addresses holds all the addresses of restruants and users
 #we cannnot link db.auth table to addresses table, therefore addresses must link to db.auth
 db.define_table('addresses',
-    Field('streetAddress'),
-    Field('city'),
-    Field('zipCode'),
-    Field('usState'),
-    Field('userID', db.auth_user),
+    Field('streetAddress', label='Street Address', required=True),
+    Field('city', label='City', required=True),
+    Field('zipCode', label='Zip Code', required=True),
+    Field('usState',label='US State', required=True),
+    Field('userID', db.auth_user, readable=False, writable=False),
     )
 db.addresses.usState.requires = IS_IN_SET(STATES)
 
@@ -89,6 +89,19 @@ db.define_table('menuTags',
     Field('tag', requires = IS_NOT_EMPTY()),
     )
 db.menuTags.menuID.readable = db.menuTags.menuID.writable = False
+
+db.define_table('orders',
+    Field('userID', db.auth_user),
+    Field('timeStart', default = datetime.utcnow()),
+    Field('restaurantID'),
+    Field('addressID', default = -1),
+    )
+
+db.define_table('orderItem',
+    Field('orderID'),
+    Field('menuID', db.menuItems),
+)
+
 
 # Taggable returns true if and only if the menuItem associated with the passed-in ID has less than 5 associated tags.
 def taggable(menuItemID):
