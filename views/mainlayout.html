@@ -49,10 +49,10 @@
 ================================================== -->
   <body>
     <div class="navbar-wrapper">
-      <div class="container">
+      <div class="container" style="width:100%; padding-left:0px; padding-right:0px">
 
-        <nav class="navbar navbar-inverse navbar-static-top">
-          <div class="container">
+        <nav class="navbar navbar-inverse navbar-static-top" style="margin-bottom:0px">
+          <div class="container" style="width: 100%; padding-left:100px">
             <div class="navbar-header">
               <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                 <span class="sr-only">Toggle navigation</span>
@@ -92,38 +92,53 @@
         <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
         <li data-target="#myCarousel" data-slide-to="1"></li>
         <li data-target="#myCarousel" data-slide-to="2"></li>
+		<li data-target="#myCarousel" data-slide-to="3"></li>
+		<li data-target="#myCarousel" data-slide-to="4"></li>
       </ol>
       <div class="carousel-inner" role="listbox">
         <div class="item active">
-          <img src="../static/images/cheeseburger.jpg" alt="First slide">
+          <img src="../static/images/photo1.jpg" alt="First slide">
           <div class="container">
             <div class="carousel-caption">
 			  <!--photo-->
+			  <!--title-->
               <h1>Example 1</h1>
-              <p>Text</p>
-              <p><a class="btn btn-lg btn-primary" href="#" role="button">Learn more</a></p>
             </div>
           </div>
         </div>
         <div class="item">
-          <img src="../static/images/potato.jpg" alt="Second slide">
+          <img src="../static/images/photo2.jpg" alt="Second slide">
           <div class="container">
             <div class="carousel-caption">
 			  <!--photo-->
               <h1>Example 2</h1>
-              <p>Text</p>
-              <p><a class="btn btn-lg btn-primary" href="#" role="button">Learn more</a></p>
             </div>
           </div>
         </div>
         <div class="item">
-          <img src="../static/images/steak.jpg" alt="Third slide">
+          <img src="../static/images/photo3.jpg" alt="Third slide">
           <div class="container">
             <div class="carousel-caption">
 			  <!--photo-->
               <h1>Example 3</h1>
-              <p>Text</p>
-              <p><a class="btn btn-lg btn-primary" href="#" role="button">Learn more</a></p>
+            </div>
+          </div>
+        </div>
+		<div class="item">
+          <img src="../static/images/photo4.jpg" alt="Third slide">
+          <div class="container">
+            <div class="carousel-caption">
+			  <!--photo-->
+              <h1>Example 4</h1>
+            </div>
+          </div>
+        </div>
+		<div class="item">
+          <img src="../static/images/photo5.jpg" alt="Third slide">
+          <div class="container">
+            <div class="carousel-caption">
+			  <!--photo-->
+              <h1>Example 5</h1>
             </div>
           </div>
         </div>
@@ -149,6 +164,9 @@
           <h2 class="featurette-heading">Title of food here <!--title--></h2>
           <p class="lead">Description here. <!--description--></p>
         </div>
+		<div class="col-md-5">
+		  <p style="padding-top:25px"><a class="btn btn-lg btn-primary" href="#" role="button">View Restaurant Page</a></p>
+		</div>
       </div>
 
       <hr class="featurette-divider">
