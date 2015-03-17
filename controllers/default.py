@@ -1,5 +1,9 @@
 import os
 from gluon.tools import Mail
+import json
+import math
+from pygeocoder import Geocoder
+import pygeolib
 # -*- coding: utf-8 -*-
 
 def index():
@@ -466,8 +470,30 @@ def removehours():
 
 def main():
     VERIFY_IS_USER(auth.user.id)
+    def withinRadius(restaurant, userLocation, radius):
+        R = 6371000
+        latRad1 = math.radians(float(restaurant.coordX))
+        latRad2 = math.radians(float(userLocation[0]))
+        deltaLat = math.radians(float(userLocation[0])-float(restaurant.coordX))
+        deltaLong = math.radians(float(userLocation[1])-float(restaurant.coordY))
 
-    return dict()
+        a = math.sin(deltaLat/2)*math.sin(deltaLat/2)+math.cos(latRad1)*math.cos(latRad2)*math.sin(deltaLong/2)*math.sin(deltaLong/2)
+        c = 2*math.atan2(math.sqrt(a), math.sqrt(1-a));
+
+        d = R*c;
+        return d<(radius*1000)
+
+    restaurants = db(db.restaurants.id > 0).select()
+    userLocation = (request.args(0), request.args(1))
+    radius = request.args(2)
+    closeBy = []
+
+    if userLocation[0] is not None and userLocation[1] is not None:
+        for i in range(0, len(restaurants)):
+            if withinRadius(restaurants[i], userLocation, radius):
+                closeBy.append(restaurants[i])
+
+    return dict(restaurants=closeBy)
 
 #This page will display the public info for a restaurant
 #This page will navigate to an ordering page
