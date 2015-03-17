@@ -3,6 +3,9 @@ from datetime import datetime
 
 DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
+HOURS = ['00','01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23']
+MINUTES = ['00','01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59']
+
 # Just a random partial list of restaurant culinary styles that can be used for the culinaryStyle list.
 CUISINES = ['African', 'American', 'Argentinian', 'BBQ', 'Belgian', 'Brazilian', 'Breakfast/Brunch', 'Cajun and Creole', 'Cambodian', 'Caribbean', 'Chinese', 'Costa Rican', 'Cuban', 'Deli', 'Dessert', 'English', 'Filipino', 'French', 'German', 'Greek', 'Haitian', 'Halal', 'Hawaiian', 'Indian', 'Indonesian', 'Irish', 'Italian', 'Jamaican', 'Japanese', 'Juices', 'Korean', 'Kosher', 'Lebanese', 'Malaysian', 'Mediterranean', 'Mexican', 'Moroccan', 'Pakistani', 'Peruvian', 'Polish', 'Portuguese', 'Russian', 'Salads', 'Sandwiches/Wraps', 'Scandinavian', 'Seafood', 'Smoothies/Shakes', 'Southern and Soul', 'Spanish', 'Sri-Lankan', 'Steakhouse', 'Taiwanese', 'Thai', 'Turkish', 'Vegan/Vegetarian', 'Venezuelan', 'Vietnamese',]
 
@@ -37,6 +40,8 @@ db.restaurants.cuisineType.requires = IS_IN_SET(CUISINES)
 db.restaurants.phone.requires = IS_MATCH('^1?(-?\d{3}-?|\(\d{3}\))\d{3}-?\d{4}$', error_message="Not a valid phone number")
 db.restaurants.email.requires = IS_EMAIL()
 
+
+
 #some resturants may have odd hours on different days 
 """Su: Closed
 M-Th: 10am-2pm 5pm -9pm
@@ -44,12 +49,13 @@ F-Sa: 10 am - 3 pm 5pm- 11 pm""" #ect. -E
 db.define_table('hours',
     Field('restaurantID', db.restaurants),
     Field('dayOfWeek'),
-    Field('openAt', 'datetime'),
-    Field('closedAt','datetime'),
+    Field('openAtHour', requires=IS_IN_SET(HOURS)),
+    Field('openAtMinute', requires=IS_IN_SET(MINUTES)),
+    Field('closedAtHour', requires=IS_IN_SET(HOURS)),
+    Field('closedAtMinute',requires=IS_IN_SET(HOURS)),
 )
 db.hours.dayOfWeek.requires = IS_IN_SET(DAYS)
-db.hours.openAt.default = datetime.utcnow()
-db.hours.closedAt.default = datetime.utcnow()
+
 
 #add phone field to auth table 
 db.define_table('users',
@@ -96,10 +102,14 @@ def taggable(menuItemID):
 # default/restaurants. NOTE: This can also be used to check the status of users other than the one who is currently logged in.
 def VERIFY_IS_RESTAURANT(userID):
     user = db(db.auth_user.id == userID).select().first()
-    if(user.accountType != 'Restaurant Representative'):
+    if(user == None):
+        redirect(URL('default','index'))
+    elif(user.accountType != 'Restaurant Representative'):
         redirect(URL('default', 'main'))
 
 def VERIFY_IS_USER(userID):
     user = db(db.auth_user.id == userID).select().first()
-    if(user.accountType != 'User'):
+    if(user == None):
+        redirect(URL('default', 'index'))
+    elif(user.accountType != 'User'):
         redirect(URL('default', 'restaurants'))

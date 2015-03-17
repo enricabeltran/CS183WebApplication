@@ -1,12 +1,18 @@
 {{extend 'layout.html'}}
 <h1>Managing {{=name}}...</h1>
+<h4><i>{{=cuisine}}</i> {{=A("Edit", _class='btn', _id="editCuisineButton")}} </h4>
+<div id ="editCuisine">
+    {{=editCuisineForm}}
+    {{=A("Cancel Edit", _class='btn', _id="editCuisineCancel")}}
+</div>
+
 <p><i>Description:</i> {{=desc}}{{=A("Edit", _class='btn', _id="editDescButton")}}</p>
 <div id ="editDesc">
     {{=editDescForm}}
     {{=A("Cancel Edit", _class='btn', _id="editDescCancel")}}
 </div>
 
-<p>
+
     <table>
         <h3>Address:{{=A("Edit", _class='btn', _id="editAddressButton")}}</h3>
         <tr>
@@ -18,12 +24,241 @@
             </td>
         </tr>
     </table>
-</p>
 <div id = "editAddress">
     {{=editAddressForm}}
     {{=A("Cancel Edit", _class='btn', _id="editAddressCancel")}}
 </div>
 
+{{sun = []}}
+{{mon = []}}
+{{tue = []}}
+{{wed = []}}
+{{thu = []}}
+{{fri = []}}
+{{sat = []}}
+{{for x in range(0, len(hours)):}}
+    {{if hours[x].dayOfWeek == "Sunday":}}
+        {{sun.append(hours[x])}}
+    {{elif hours[x].dayOfWeek == "Monday":}}
+        {{mon.append(hours[x])}}
+    {{elif hours[x].dayOfWeek == "Tuesday":}}
+        {{tue.append(hours[x])}}
+    {{elif hours[x].dayOfWeek == "Wednesday":}}
+        {{wed.append(hours[x])}}
+    {{elif hours[x].dayOfWeek == "Thursday":}}
+        {{thu.append(hours[x])}}
+    {{elif hours[x].dayOfWeek == "Friday":}}
+        {{fri.append(hours[x])}}
+    {{else:}}
+        {{sat.append(hours[x])}}
+    {{pass}}
+{{pass}}
+
+
+    <table>
+        <h3>Hours:{{=A("Add", _class='btn', _id="addHoursButton")}}</h3>
+        <tr>
+            <td>Sunday: </td>
+            <td>{{if len(sun) == 0:}}
+                    Closed.
+                {{else:}}
+                    {{earlyI = 0 #index of earliest open time}}
+                    {{while len(sun) > 0:}}
+                        {{openHour = sun[earlyI].openAtHour}}
+                        {{openMinute = sun[earlyI].openAtMinute}}
+                        {{closeHour = sun[earlyI].closedAtHour}}
+                        {{closeMinute = sun[earlyI].closedAtMinute}}
+                        {{for j in range(0, len(sun)):}}
+                            {{if (openHour == sun[j].openAtHour and sun[j].openAtMinute > openMinute) or (sun[j].openAtHour > openHour):}}
+                                {{earlyI=j}}
+                                {{openHour = sun[earlyI].openAtHour}}
+                                {{openMinute = sun[earlyI].openAtMinute}}
+                                {{closeHour = sun[earlyI].closedAtHour}}
+                                {{closeMinute = sun[earlyI].closedAtMinute}}
+                            {{pass}}
+                        {{pass}}
+                       {{=openHour}}:{{=openMinute}}-{{=closeHour}}:{{=closeMinute}}</br>
+                        {{sun.pop(earlyI)}}
+                        {{earlyI = 0}}
+                    {{pass}}
+                {{pass}}
+                </td>
+        </tr>
+        <p>
+        <tr>
+            <td>Monday: </td>
+            <td>{{if len(mon) == 0:}}
+                    Closed.
+                {{else:}}
+                    {{earlyI = 0 #index of earliest open time}}
+                    {{while len(mon) > 0:}}
+                        {{openHour = sun[earlyI].openAtHour}}
+                        {{openMinute = sun[earlyI].openAtMinute}}
+                        {{closeHour = sun[earlyI].closedAtHour}}
+                        {{closeMinute = sun[earlyI].closedAtMinute}}
+                        {{for j in range(0, len(mon)):}}
+                            {{if (openHour == mon[j].openAtHour and mon[j].openAtMinute > openMinute) or (mon[j].openAtHour > openHour):}}
+                                {{earlyI=j}}
+                                {{openHour = mon[earlyI].openAtHour}}
+                                {{openMinute = mon[earlyI].openAtMinute}}
+                                {{closeHour = mon[earlyI].closedAtHour}}
+                                {{closeMinute = mon[earlyI].closedAtMinute}}
+                            {{pass}}
+                        {{pass}}
+                       {{=openHour}}:{{=openMinute}}-{{=closeHour}}:{{=closeMinute}}</br>
+                        {{mon.pop(earlyI)}}
+                        {{earlyI = -1}}
+                    {{pass}}
+                {{pass}}
+                </td>
+        </tr>
+        </p>
+        <p>
+        <tr>
+            <td>Tuesday: </td>
+            <td>{{if len(tue) == 0:}}
+                    Closed.
+                {{else:}}
+                    {{earlyI = 0 #index of earliest open time}}
+                    {{while len(tue) > 0:}}
+                        {{openHour = tue[earlyI].openAtHour}}
+                        {{openMinute = tue[earlyI].openAtMinute}}
+                        {{closeHour = tue[earlyI].closedAtHour}}
+                        {{closeMinute = tue[earlyI].closedAtMinute}}
+                        {{for j in range(0, len(tue)):}}
+                            {{if (openHour == tue[j].openAtHour and tue[j].openAtMinute > openMinute) or (tue[j].openAtHour > openHour):}}
+                                {{earlyI=j}}
+                                {{openHour = tue[earlyI].openAtHour}}
+                                {{openMinute = tue[earlyI].openAtMinute}}
+                                {{closeHour = tue[earlyI].closedAtHour}}
+                                {{closeMinute = tue[earlyI].closedAtMinute}}
+                            {{pass}}
+                        {{pass}}
+                       {{=openHour}}:{{=openMinute}}-{{=closeHour}}:{{=closeMinute}}</br>
+                        {{tue.pop(earlyI)}}
+                        {{earlyI = -1}}
+                    {{pass}}
+                {{pass}}
+                </td>
+            </tr></p>
+        <p>
+        <tr>
+            <td>Wednesday: </td>
+            <td>{{if len(wed) == 0:}}
+                    Closed.
+                {{else:}}
+                    {{earlyI = 0 #index of earliest open time}}
+                    {{while len(wed) > 0:}}
+                        {{openHour = wed[earlyI].openAtHour}}
+                        {{openMinute = wed[earlyI].openAtMinute}}
+                        {{closeHour = wed[earlyI].closedAtHour}}
+                        {{closeMinute = wed[earlyI].closedAtMinute}}
+                        {{for j in range(0, len(wed)):}}
+                            {{if (openHour == wed[j].openAtHour and wed[j].openAtMinute > openMinute) or (wed[j].openAtHour > openHour):}}
+                                {{earlyI=j}}
+                                {{openHour = wed[earlyI].openAtHour}}
+                                {{openMinute = wed[earlyI].openAtMinute}}
+                                {{closeHour = wed[earlyI].closedAtHour}}
+                                {{closeMinute = wed[earlyI].closedAtMinute}}
+                            {{pass}}
+                        {{pass}}
+                       {{=openHour}}:{{=openMinute}}-{{=closeHour}}:{{=closeMinute}}</br>
+                        {{wed.pop(earlyI)}}
+                        {{earlyI = -1}}
+                    {{pass}}
+                {{pass}}
+                </td>
+            </tr></p>
+        <p>
+        <tr>
+            <td>Thursday: </td>
+            <td>{{if len(thu) == 0:}}
+                    Closed.
+                {{else:}}
+                    {{earlyI = 0 #index of earliest open time}}
+                    {{while len(thu) > 0:}}
+                         {{openHour = thu[earlyI].openAtHour}}
+                        {{openMinute = thu[earlyI].openAtMinute}}
+                        {{closeHour = thu[earlyI].closedAtHour}}
+                        {{closeMinute = thu[earlyI].closedAtMinute}}
+                        {{for j in range(0, len(thu)):}}
+                            {{if (openHour == thu[j].openAtHour and thu[j].openAtMinute > openMinute) or (thu[j].openAtHour > openHour):}}
+                                {{earlyI=j}}
+                                {{openHour = thu[earlyI].openAtHour}}
+                                {{openMinute = thu[earlyI].openAtMinute}}
+                                {{closeHour = thu[earlyI].closedAtHour}}
+                                {{closeMinute = thu[earlyI].closedAtMinute}}
+                            {{pass}}
+                        {{pass}}
+                       {{=openHour}}:{{=openMinute}}-{{=closeHour}}:{{=closeMinute}}</br>
+                        {{thu.pop(earlyI)}}
+                        {{earlyI = -1}}
+                    {{pass}}
+                {{pass}}
+                </td>
+        </tr>
+        </p>
+        <p>
+        <tr>
+            <td>Friday: </td>
+            <td>{{if len(fri) == 0:}}
+                    Closed.
+                {{else:}}
+                    {{earlyI = 0 #index of earliest open time}}
+                    {{while len(fri) > 0:}}
+                        {{openHour = fri[earlyI].openAtHour}}
+                        {{openMinute = fri[earlyI].openAtMinute}}
+                        {{closeHour = fri[earlyI].closedAtHour}}
+                        {{closeMinute = fri[earlyI].closedAtMinute}}
+                        {{for j in range(0, len(fri)):}}
+                            {{if (openHour == fri[j].openAtHour and fri[j].openAtMinute > openMinute) or (fri[j].openAtHour > openHour):}}
+                                {{earlyI=j}}
+                                {{openHour = fri[earlyI].openAtHour}}
+                                {{openMinute = fri[earlyI].openAtMinute}}
+                                {{closeHour = fri[earlyI].closedAtHour}}
+                                {{closeMinute = fri[earlyI].closedAtMinute}}
+                            {{pass}}
+                        {{pass}}
+                       {{=openHour}}:{{=openMinute}}-{{=closeHour}}:{{=closeMinute}}</br>
+                        {{fri.pop(earlyI)}}
+                        {{earlyI = -1}}
+                    {{pass}}
+                {{pass}}
+                </td>
+            </tr></p>
+        <p>
+        <tr>
+            <td>Saturday: </td>
+            <td>{{if len(sat) == 0:}}
+                    Closed.
+                {{else:}}
+                    {{while len(sat) > 0:}}
+                        {{earlyI = 0 #index of earliest open time}}
+                        {{openHour = sat[earlyI].openAtHour}}
+                        {{openMinute = sat[earlyI].openAtMinute}}
+                        {{closeHour = sat[earlyI].closedAtHour}}
+                        {{closeMinute = sat[earlyI].closedAtMinute}}
+                        {{for j in range(0, len(sat)):}}
+                            {{if (openHour == sat[j].openAtHour and sat[j].openAtMinute > openMinute) or (sat[j].openAtHour > openHour):}}
+                                {{earlyI=j}}
+                                {{openHour = sat[earlyI].openAtHour}}
+                                {{openMinute = sat[earlyI].openAtMinute}}
+                                {{closeHour = sat[earlyI].closedAtHour}}
+                                {{closeMinute = sat[earlyI].closedAtMinute}}
+                            {{pass}}
+                        {{pass}}
+                       {{=openHour}}:{{=openMinute}}-{{=closeHour}}:{{=closeMinute}}</br>
+                        {{sat.pop(earlyI)}}
+                        {{earlyI = -1}}
+                    {{pass}}
+                {{pass}}
+                </td>
+            </tr></p>
+</table>
+        <div id="addHours">
+            {{=addHoursForm}}
+            {{=A("Cancel Edit", _class='btn', _id="addHoursCancel")}}
+        </div>
 <table>
     <h3>Contact Info:{{=A("Edit", _class='btn', _id="editContactButton")}}</h3>
 
@@ -107,6 +342,22 @@
     });
     jQuery("#editDescButton").click(function(){
         $("#editDesc").fadeIn();
+    });
+    
+    jQuery("#editCuisine").hide();
+    jQuery("#editCuisineCancel").click(function(){
+        $("#editCuisine").fadeOut();
+    });
+    jQuery("#editCuisineButton").click(function(){
+        $("#editCuisine").fadeIn();
+    });
+
+    jQuery("#addHours").hide();
+    jQuery("#addHoursCancel").click(function(){
+        $("#addHours").fadeOut();
+    });
+    jQuery("#addHoursButton").click(function(){
+        $("#addHours").fadeIn();
     });
 
     jQuery("#editContact").hide();

@@ -11,7 +11,6 @@ import os
 #########################################################################
 
 def index():
-    form = ''
     startAsRestaurant = ''
     startAsUser = ''
 
@@ -24,7 +23,8 @@ def index():
     else:
          startAsRestaurant = A('Start As Restuarant', _class='btn', _href=URL('default', 'login', args=['restaurant']))
          startAsUser = A('Start As User', _class='btn', _href=URL('default', 'login', args=['user']))
-    return dict(startAsRestaurant=startAsRestaurant, startAsUser=startAsUser, form=form)
+
+    return dict(startAsRestaurant=startAsRestaurant, startAsUser=startAsUser)
 
 def login():
 
@@ -108,7 +108,7 @@ def addRest():
                           )
     if form.process().accepted:
         db.restaurants.insert(ownerID = auth.user.id,
-                               cuisineType = cuisineType,
+                               cuisineType = form.vars.cuisineType,
                                restaurantName = form.vars.restaurantName,
                                phone = form.vars.phone,
                                email = form.vars.email,
@@ -136,14 +136,22 @@ def deleteRest():
 def manage():
     VERIFY_IS_RESTAURANT(auth.user.id)
 
+    DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    CUISINES = ['African', 'American', 'Argentinian', 'BBQ', 'Belgian', 'Brazilian', 'Breakfast/Brunch', 'Cajun and Creole', 'Cambodian', 'Caribbean', 'Chinese', 'Costa Rican', 'Cuban', 'Deli', 'Dessert', 'English', 'Filipino', 'French', 'German', 'Greek', 'Haitian', 'Halal', 'Hawaiian', 'Indian', 'Indonesian', 'Irish', 'Italian', 'Jamaican', 'Japanese', 'Juices', 'Korean', 'Kosher', 'Lebanese', 'Malaysian', 'Mediterranean', 'Mexican', 'Moroccan', 'Pakistani', 'Peruvian', 'Polish', 'Portuguese', 'Russian', 'Salads', 'Sandwiches/Wraps', 'Scandinavian', 'Seafood', 'Smoothies/Shakes', 'Southern and Soul', 'Spanish', 'Sri-Lankan', 'Steakhouse', 'Taiwanese', 'Thai', 'Turkish', 'Vegan/Vegetarian', 'Venezuelan', 'Vietnamese',]
+    HOURS = ['00','01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23']
+    MINUTES = ['00','01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59']
+
     name = ''
     email = ''
     phone = ''
     desc = ''
     menu = ''
+    cuisine = ''
+    hours = ''
     restID = -1
     tags = [] # I'm not sure this is even used... -Sam
     tagForms = []
+    addHoursForm = ''
 
     restaurant = db(db.restaurants.id == request.args(0)).select().first()
     address = db(db.addresses.id == restaurant.addressID).select().first()
@@ -153,8 +161,10 @@ def manage():
         phone = restaurant.phone
         desc = restaurant.description
         menu = db(db.menuItems.restaurantID == request.args(0)).select()
+        hours = db(db.hours.restaurantID == request.args(0)).select()
         restID = restaurant.id
         address = db(db.addresses.id == restaurant.addressID).select().first()
+        cuisine = restaurant.cuisineType
 
         editDescForm = SQLFORM.factory(Field('description', 'text',
                                              requires = IS_NOT_EMPTY(),
@@ -166,6 +176,16 @@ def manage():
             redirect(URL('default', 'manage', args=[request.args(0)]))
 
         editDescForm.elements('.w2p_fl', replace=None) # This removes the auto-generated labels from the form fields
+        editCuisineForm = SQLFORM.factory(Field('cuisineType',
+                                             requires = IS_IN_SET(CUISINES),
+                                             label = 'Cuisine',
+                                             default=restaurant.cuisineType,
+                                            ),
+                                      )
+        if editCuisineForm.process(formname='editCuisineForm').accepted:
+            restaurant.update_record(cuisineType = editCuisineForm.vars.cuisineType)
+            redirect(URL('default', 'manage', args=[request.args(0)]))
+        
         editAddressForm = SQLFORM.factory(Field('streetAddress',
                                  label = 'Address',
                                  default = address.streetAddress,
@@ -203,6 +223,53 @@ def manage():
                                    )
             redirect(URL('default', 'manage', args=[request.args(0)]))
 
+
+        addHoursForm = SQLFORM.factory(Field('dayOfWeek',
+                                             requires = IS_IN_SET(DAYS),
+                                             default = 'Sunday',
+                                             label = 'Day',
+                                             ),
+                                       Field('openAtHour',
+                                             requires = IS_IN_SET(HOURS),
+                                             label = 'Opens at (hour)',
+                                             ),
+                                       Field('openAtMinute',
+                                             requires = IS_IN_SET(MINUTES),
+                                             label = 'Opens at (minute)',
+                                             ),
+                                       Field('closedAtHour',
+                                             requires = IS_IN_SET(HOURS),
+                                             label = 'Closes at (hour)',
+                                             ),
+                                       Field('closedAtMinute',
+                                             requires = IS_IN_SET(MINUTES),
+                                             label = 'Closes at (minute)',
+                                             ),
+                                       )
+
+        def earlier(openHour,openMinute, closeHour, closeMinute):
+            if openHour == closeHour:
+                return openMinute<closeMinute
+            else:
+                return openHour<closeHour
+
+        if addHoursForm.process(formname='addHoursForm').accepted:
+             
+            if earlier(int(addHoursForm.vars.openAtHour), int(addHoursForm.vars.openAtMinute), int(addHoursForm.vars.closedAtHour), addHoursForm.vars.closesAtMinute):
+                db.hours.insert(restaurantID = request.args(0),
+                                    dayOfWeek = addHoursForm.vars.dayOfWeek,
+                                    openAtHour = addHoursForm.vars.openAtHour,
+                                    openAtMinute = addHoursForm.vars.openAtMinute,
+                                    closedAtHour = addHoursForm.vars.closedAtHour,
+                                    closedAtMinute = addHoursForm.vars.closedAtMinute,
+                                   )
+                redirect(URL('default', 'manage', args=[request.args(0)]))
+            else:
+                session.flash="Invalid time range. Please make sure your opening time is earlier than your closing time."
+                redirect(URL('default', 'manage', args=[request.args(0)]))
+           
+
+            
         editContactForm = SQLFORM.factory(Field('phone',
                                                 label='New Business Phone',
                                                 default = phone,
@@ -251,6 +318,10 @@ def manage():
                 editAddressForm=editAddressForm,
                 tagForms=tagForms,
                 menuItemForm=menuItemForm,
+                addHoursForm=addHoursForm,
+                hours=hours,
+                editCuisineForm=editCuisineForm,
+                cuisine=cuisine,
                )
 
 @auth.requires_login()

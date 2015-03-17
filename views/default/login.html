@@ -6,10 +6,10 @@ Register as a User!
 Register as a Restaurant Representative
 {{pass}}
 
-{{=form}} <!-- WHOOOP login system! gotta implement groups tho -->
+{{=form}}
 
 {{if not register and request.args(0)=='user':}}
 {{=A('Register as a User', _class='btn', _href=URL('default', 'login', args=[request.args(0),'register']))}}
 {{elif not register and request.args(0)=='restaurant':}}
-{{=A('Register as a Restaurant Representative', _class='btn', _href=URL('default', 'login', args=[request.args(0),'register']))}}
+{{=A('Register as a Resturant Representative', _class='btn', _href=URL('default', 'login', args=[request.args(0),'register']))}}
 {{pass}}
