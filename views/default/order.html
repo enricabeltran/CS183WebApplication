@@ -1,0 +1,43 @@
+{{extend 'layout.html'}}
+<h1>Ordering from {{=name}}</h1>
+<h3>Menu:</h3>
+{{cat = ""}}
+{{for i in range(0, len(menu)):}}
+    {{if menu[i].category != cat:}}
+        {{if menu[i].category == None and cat !=None:}}
+            {{cat = None}}
+            <h4><b>No Category</b></h4>
+        {{pass}}
+        {{if menu[i].category != None:}}
+            {{cat = menu[i].category}}
+            <h4><b>{{=cat}}</b></h4>
+        {{pass}}
+    {{pass}}
+<table>
+    <tr>
+        <th>Name</th>
+        <th></th>
+        <th>Price</th>
+        <th></th>
+        <th>Description</th>
+    <tr>
+        <td>{{=menu[i].dishName}}</td>
+        <td>.....</td>
+        <td>${{=menu[i].price}}</td>
+        <td>.....</td>
+        <td><i>{{=menu[i].description}}</i></td>
+        <td>Add To Order</td>
+    </tr>
+</table>
+{{pass}}
+
+<h3>Your Order:</h3>
+<table>
+    <tr>
+        <th>Item</th>
+        <th>Quantity</th>
+        <th>Subtotal</th>
+    </tr>
+</table>
+
+{{=backButton}}

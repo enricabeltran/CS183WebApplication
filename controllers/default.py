@@ -417,6 +417,17 @@ def restaurantPage():
 
     return dict(cuisine=cuisine, name=name, email=email, phone=phone, desc=desc, menu=menu, restID=restID, cancelButton=cancelButton)
 
+def order():
+    name = "Error: Restaurant Not Specified"
+    menu = []
+    backButton = A("Back", _class='btn', _href=URL('default', 'main')) # This should check if the user came from the restaurantPage (somehow), and take then back accordingly
+
+    if request.args(0) is not None:
+        restaurant = db(db.restaurants.id == request.args(0)).select().first()
+        name = restaurant.restaurantName
+        menu = db(db.menuItems.restaurantID == restaurant.id).select()
+    return dict(name=name, menu=menu, backButton=backButton)
+
 
 def user():
     """
