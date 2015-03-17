@@ -156,7 +156,7 @@ def manage():
         coordY = restaurant.coordY
         menu = db(db.menuItems.restaurantID == request.args(0)).select()
         restID = restaurant.id
-        address = db(db.addresses.restaurantID == restID).select().first()
+        address = db(db.addresses.id == restaurant.addressID).select().first()
 
         editDescForm = SQLFORM.factory(Field('description', 'text',
                                              requires = IS_NOT_EMPTY(),
