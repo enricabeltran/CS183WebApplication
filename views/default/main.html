@@ -15,7 +15,8 @@
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position){
-                window.location.href = "{{=URL('default', 'main')}}" + '/' + position.coords.latitude + '/' + position.coords.longitude + '/' + '10';
+                //window.location.href = "{{=URL('default', 'main')}}" + '/' + position.coords.latitude + '/' + position.coords.longitude + '/' + '10';
+                x.innerHTML = "You're at (" + position.coords.latitude + ',' + position.coords.longitude + ")";
             });
         } else {
             x.innerHTML = errorMessage;

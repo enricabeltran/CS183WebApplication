@@ -165,7 +165,7 @@ def manage():
         desc = restaurant.description
         coordX = restaurant.coordX
         coordY = restaurant.coordY
-        menu = db(db.menuItems.restaurantID == request.args(0)).select()
+        menu = db(db.menuItems.restaurantID == request.args(0)).select(orderby=db.menuItems.category)
         hours = db(db.hours.restaurantID == request.args(0)).select()
         restID = restaurant.id
         address = db(db.addresses.id == restaurant.addressID).select().first()
@@ -607,7 +607,7 @@ def order():
     if request.args(0) is not None:
         restaurant = db(db.restaurants.id == request.args(0)).select().first()
         name = restaurant.restaurantName
-        menu = db(db.menuItems.restaurantID == restaurant.id).select()
+        menu = db(db.menuItems.restaurantID == restaurant.id).select(orderby=db.menuItems.category)
         cart = db(db.orderItem.orderID == request.args(1)).select()
         for i in range(0,len(cart)):
             dish = db(db.menuItems.id == cart[i].menuID).select().first()
@@ -699,7 +699,7 @@ def confirmOrder():
                 dish = db(db.menuItems.id == cart[i].menuID).select().first()
                 m = m + dish.dishName +'\t $'+dish.price+'\n'
             m = m +'\n Subtotal: $'+str(subtotal) + '\n'
-            m = m +'Customer Order Information: \n'+ customerName +'\n' + contactForm.vars.email +'\n' + contactForm.vars.phone +'\n' +contactForm.vars.streetAddress+'\n'+contactForm.vars.city+'n'+conactForm.vars.zipCode+'\n'+contactForm.vars.usState
+            m = m +'Customer Order Information: \n'+ customerName +'\n' + contactForm.vars.email +'\n' + contactForm.vars.phone +'\n' +contactForm.vars.streetAddress+'\n'+contactForm.vars.city+'n'+contactForm.vars.zipCode+'\n'+contactForm.vars.usState
             
             mail.send(to=[restaurant.email],
                         subject='New: Order#'+request.args(0),
